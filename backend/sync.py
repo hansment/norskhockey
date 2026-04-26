@@ -367,8 +367,8 @@ def beregn_rating(cursor):
                 (endelig, rad["person_id"], rad["team_id"], rad["season"])
             )
 
-def synk_alt():
-    if not er_sesong_aktiv():
+def synk_alt(force=False):
+    if not force and not er_sesong_aktiv():
         logg("SKIPPED", "Ingen aktiv sesong")
         return
 

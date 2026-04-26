@@ -28,3 +28,9 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "Hockey Stats API kjører!"}
+
+@app.get("/admin/sync")
+def manuell_sync():
+    thread = threading.Thread(target=lambda: sync.synk_alt(force=True))
+    thread.start()
+    return {"message": "Synkronisering startet i bakgrunnen"}
