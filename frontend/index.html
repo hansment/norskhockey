@@ -430,21 +430,49 @@
 
         .ad-placeholder .ad-lbl { font-size: 0.75rem; font-weight: 700; }
         .ad-placeholder .ad-size { font-size: 0.6rem; opacity: 0.55; }
+
+        /* MOBILE */
+        .nav-links { display: flex; gap: 0.5rem; align-items: center; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; background: transparent; border: none; cursor: pointer; padding: 6px 4px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: rgba(168,216,240,0.7); border-radius: 1px; transition: transform 0.2s, opacity 0.2s; }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        .nav-mobile-menu { background: rgba(3,17,31,0.98); border-top: 1px solid rgba(168,216,240,0.08); padding: 0.5rem 1.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.15rem; }
+        .nav-mobile-menu .nav-link { padding: 0.65rem 0.8rem; }
+        .footer-inner { display: flex; justify-content: space-between; align-items: center; }
+        .home-top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        @media (max-width: 640px) {
+            .nav-links { display: none !important; }
+            .hamburger { display: flex; }
+            .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+            .home-top-grid { grid-template-columns: 1fr; gap: 2rem; }
+        }
     </style>
 </head>
 <body class="ice-bg">
 
     <!-- NAVBAR -->
-    <nav>
+    <nav x-data="{ menuOpen: false }">
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
             <div class="nav-logo">NorskHockey<span>.no</span></div>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="nav-links">
                 <a href="index.html" class="nav-link active">Hjem</a>
                 <a href="ehl.html" class="nav-link">EHL</a>
                 <a href="hl1.html" class="nav-link">HockeyLiga1</a>
                 <a href="lag.html" class="nav-link">Lag</a>
                 <a href="om-rating.html" class="nav-link">Om Rating</a>
             </div>
+            <button class="hamburger" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="Meny">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="nav-mobile-menu" x-show="menuOpen" @click.outside="menuOpen = false" style="display: none;">
+            <a href="index.html" class="nav-link active">Hjem</a>
+            <a href="ehl.html" class="nav-link">EHL</a>
+            <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+            <a href="lag.html" class="nav-link">Lag</a>
+            <a href="om-rating.html" class="nav-link">Om Rating</a>
         </div>
     </nav>
 
@@ -476,7 +504,7 @@
         </div>
 
         <!-- TOP 5 SPILLERE -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+        <div class="home-top-grid">
 
             <!-- VENSTRE: TOPP 5 -->
             <div>
@@ -597,7 +625,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;" class="footer-inner">
             <span>NorskHockey.no</span>
             <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
         </div>
