@@ -149,6 +149,25 @@
         .search-input::placeholder { color: rgba(168, 216, 240, 0.3); }
         .search-input:focus { border-color: rgba(168, 216, 240, 0.3); }
 
+        .season-select {
+            background: rgba(168, 216, 240, 0.06);
+            border: 1px solid rgba(168, 216, 240, 0.12);
+            border-radius: 6px;
+            padding: 0.55rem 0.8rem;
+            color: var(--ice-bright);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .season-select:focus { border-color: rgba(168, 216, 240, 0.3); }
+        .season-select option { background: #071e30; color: #d4f1ff; }
+
         .pos-filter {
             display: flex;
             gap: 0.3rem;
@@ -416,7 +435,19 @@
                 <span class="count-badge" x-text="filtrertListe.length + ' spillere'"></span>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+                <!-- SESONG -->
+                <select
+                    class="season-select"
+                    x-model="sesongValgt"
+                    @change="hentSpillere(); hentKeepere()"
+                    x-show="sesonger.length > 1"
+                >
+                    <template x-for="s in sesonger" :key="s">
+                        <option :value="s" x-text="s"></option>
+                    </template>
+                </select>
+
                 <!-- SØK -->
                 <input
                     class="search-input"
@@ -557,6 +588,8 @@
                 visning: 'spillere',
                 spillere: [],
                 keepere: [],
+                sesonger: [],
+                sesongValgt: null,
                 laster: true,
                 sok: '',
                 posFilter: 'ALLE',
@@ -564,8 +597,18 @@
                 sortStigende: false,
 
                 async init() {
-                    await this.hentSpillere();
-                    await this.hentKeepere();
+                    await this.hentSesonger();
+                    await Promise.all([this.hentSpillere(), this.hentKeepere()]);
+                },
+
+                async hentSesonger() {
+                    try {
+                        const res = await fetch(`${API}/sesonger`);
+                        this.sesonger = await res.json();
+                        if (this.sesonger.length > 0) this.sesongValgt = this.sesonger[0];
+                    } catch(e) {
+                        console.error(e);
+                    }
                 },
 
                 async byttVisning(v) {
@@ -578,7 +621,9 @@
                 async hentSpillere() {
                     this.laster = true;
                     try {
-                        const res = await fetch(`${API}/spillere?divisjon=HL1`);
+                        const params = new URLSearchParams({ divisjon: 'HL1' });
+                        if (this.sesongValgt) params.append('sesong', this.sesongValgt);
+                        const res = await fetch(`${API}/spillere?${params}`);
                         this.spillere = await res.json();
                     } catch(e) {
                         console.error(e);
@@ -589,7 +634,9 @@
 
                 async hentKeepere() {
                     try {
-                        const res = await fetch(`${API}/keepere?divisjon=HL1`);
+                        const params = new URLSearchParams({ divisjon: 'HL1' });
+                        if (this.sesongValgt) params.append('sesong', this.sesongValgt);
+                        const res = await fetch(`${API}/keepere?${params}`);
                         this.keepere = await res.json();
                     } catch(e) {
                         console.error(e);
