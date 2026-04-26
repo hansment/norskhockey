@@ -1,0 +1,390 @@
+﻿<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lag – NorskHockey.no</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ice: #a8d8f0;
+            --ice-bright: #d4f1ff;
+            --rink: #03111f;
+            --rink-mid: #071e30;
+            --rink-light: #0d2d45;
+            --gold: #f0c040;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--rink);
+            color: #e8f4fd;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+        .ice-bg {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 216, 240, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 216, 240, 0.06) 0%, transparent 50%),
+                var(--rink);
+        }
+
+        nav {
+            background: rgba(3, 17, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--ice); opacity: 0.6; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--ice-bright);
+            background: rgba(168, 216, 240, 0.1);
+        }
+
+        .page-header {
+            padding: 2.5rem 0 2rem;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            text-transform: uppercase;
+            color: var(--ice-bright);
+            line-height: 1;
+        }
+
+        .page-title .sub {
+            font-size: 0.4em;
+            color: rgba(168, 216, 240, 0.4);
+            letter-spacing: 0.15em;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 0.4rem;
+            background: rgba(168, 216, 240, 0.05);
+            padding: 0.3rem;
+            border-radius: 6px;
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.45rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: rgba(168, 216, 240, 0.5);
+            border: none;
+        }
+
+        .tab-btn.active {
+            background: rgba(168, 216, 240, 0.12);
+            color: var(--ice-bright);
+        }
+
+        /* LAG KORT */
+        .lag-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .lag-kort {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 10px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .lag-kort:hover {
+            background: var(--rink-light);
+            border-color: rgba(168, 216, 240, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .lag-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background: var(--rink-light);
+            border: 1px solid rgba(168, 216, 240, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: var(--ice);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .lag-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .lag-navn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--ice-bright);
+            line-height: 1.1;
+        }
+
+        .lag-divisjon {
+            font-size: 0.75rem;
+            color: rgba(168, 216, 240, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 0.3rem;
+        }
+
+        .lag-pil {
+            margin-left: auto;
+            color: rgba(168, 216, 240, 0.2);
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .lag-kort:hover .lag-pil {
+            color: rgba(168, 216, 240, 0.6);
+            transform: translateX(4px);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(168, 216, 240, 0.4);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 3rem 0;
+            justify-content: center;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--ice);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            border-top: 1px solid rgba(168, 216, 240, 0.08);
+            padding: 2rem 0;
+            color: rgba(168, 216, 240, 0.25);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: var(--rink); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 216, 240, 0.2);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 216, 240, 0.45);
+            border: 1px solid transparent;
+        }
+        /* AD PLACEHOLDER */
+        .ad-placeholder {
+            border: 1px dashed rgba(168, 216, 240, 0.12);
+            border-radius: 8px;
+            background: rgba(168, 216, 240, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(168, 216, 240, 0.18);
+            font-family: 'Barlow Condensed', sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            gap: 0.2rem;
+        }
+
+        .ad-placeholder .ad-lbl { font-size: 0.75rem; font-weight: 700; }
+        .ad-placeholder .ad-size { font-size: 0.6rem; opacity: 0.55; }
+    </style>
+</head>
+<body class="ice-bg">
+
+    <nav>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+            <a href="index.html" class="nav-logo">NorskHockey<span>.no</span></a>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <a href="index.html" class="nav-link">Hjem</a>
+                <a href="ehl.html" class="nav-link">EHL</a>
+                <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+                <a href="lag.html" class="nav-link active">Lag</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;" x-data="lagData()">
+
+        <div class="page-header">
+            <h1 class="page-title">
+                <span class="sub">Norsk Ishockey</span>
+                Lag
+            </h1>
+        </div>
+
+        <!-- TABS -->
+        <div class="tab-group">
+            <button class="tab-btn" :class="{ active: divisjon === 'EHL' }" @click="byttDivisjon('EHL')">EHL</button>
+            <button class="tab-btn" :class="{ active: divisjon === 'HL1' }" @click="byttDivisjon('HL1')">HockeyLiga1</button>
+        </div>
+
+        <!-- LOADING -->
+        <div x-show="laster" class="loading">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <span>Henter lag...</span>
+        </div>
+
+        <!-- LAG GRID -->
+        <div x-show="!laster" class="lag-grid fade-in">
+            <template x-for="lag in filtrerteLag" :key="lag.id">
+                <a :href="`lagprofil.html?id=${lag.id}`" class="lag-kort">
+                    <div class="lag-logo">
+                        <img x-show="lag.logo" :src="lag.logo" :alt="lag.name" @error="$el.style.display='none'">
+                        <span x-show="!lag.logo" x-text="lag.name.substring(0, 2).toUpperCase()"></span>
+                    </div>
+                    <div>
+                        <div class="lag-navn" x-text="lag.name"></div>
+                        <div class="lag-divisjon" x-text="lag.division === 'EHL' ? 'Elite Hockey League' : 'HockeyLiga1'"></div>
+                    </div>
+                    <div class="lag-pil">→</div>
+                </a>
+            </template>
+        </div>
+
+    </div>
+
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between;">
+            <span>NorskHockey.no</span>
+            <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
+        </div>
+    </footer>
+
+    <script>
+        const API = 'http://127.0.0.1:8000';
+
+        function lagData() {
+            return {
+                divisjon: 'EHL',
+                lag: [],
+                laster: true,
+
+                async init() {
+                    await this.hentLag();
+                },
+
+                async byttDivisjon(div) {
+                    this.divisjon = div;
+                },
+
+                async hentLag() {
+                    this.laster = true;
+                    try {
+                        const res = await fetch(`${API}/lag`);
+                        this.lag = await res.json();
+                    } catch(e) {
+                        console.error(e);
+                    } finally {
+                        this.laster = false;
+                    }
+                },
+
+                get filtrerteLag() {
+                    return this.lag.filter(l => l.division === this.divisjon);
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

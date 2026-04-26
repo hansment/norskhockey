@@ -1,0 +1,708 @@
+﻿<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om FrostRating – NorskHockey.no</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ice: #a8d8f0;
+            --ice-bright: #d4f1ff;
+            --rink: #03111f;
+            --rink-mid: #071e30;
+            --rink-light: #0d2d45;
+            --gold: #f0c040;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--rink);
+            color: #e8f4fd;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+        .ice-bg {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 216, 240, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 216, 240, 0.06) 0%, transparent 50%),
+                var(--rink);
+        }
+
+        nav {
+            background: rgba(3, 17, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--ice); opacity: 0.6; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active { color: var(--ice-bright); background: rgba(168, 216, 240, 0.1); }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            border-left: 3px solid var(--ice);
+            padding-left: 0.7rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .card {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .prose {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: rgba(168, 216, 240, 0.65);
+        }
+
+        .prose strong {
+            color: var(--ice-bright);
+            font-weight: 600;
+        }
+
+        /* VEKT-RAD */
+        .weight-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.05);
+        }
+
+        .weight-row:last-child { border-bottom: none; }
+
+        .weight-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--ice-bright);
+            width: 140px;
+            flex-shrink: 0;
+        }
+
+        .weight-bar-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(168, 216, 240, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .weight-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, rgba(168, 216, 240, 0.3), rgba(168, 216, 240, 0.8));
+        }
+
+        .weight-pct {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--ice);
+            width: 36px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .weight-desc {
+            font-size: 0.75rem;
+            color: rgba(168, 216, 240, 0.35);
+            width: 180px;
+            flex-shrink: 0;
+        }
+
+        /* FORMEL BOKS */
+        .formula-box {
+            background: rgba(168, 216, 240, 0.04);
+            border: 1px solid rgba(168, 216, 240, 0.1);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.9rem;
+            color: rgba(168, 216, 240, 0.6);
+            line-height: 1.8;
+        }
+
+        .formula-box .var { color: var(--ice-bright); font-weight: 700; }
+        .formula-box .op  { color: rgba(168, 216, 240, 0.3); }
+        .formula-box .w   { color: var(--gold); }
+
+        /* OVR TIERS */
+        .tier-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.05);
+        }
+
+        .tier-row:last-child { border-bottom: none; }
+
+        .tier-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 6px;
+            width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .ovr-90 { background: linear-gradient(135deg, #1a3a00, #2d6a00); color: #7fff00; border: 1px solid #4a9900; }
+        .ovr-80 { background: linear-gradient(135deg, #1a3300, #2d5a00); color: #a8e060; border: 1px solid #3a7800; }
+        .ovr-70 { background: linear-gradient(135deg, #1a2d00, #2d4a00); color: #c8d870; border: 1px solid #506000; }
+        .ovr-60 { background: linear-gradient(135deg, #2d2000, #4a3500); color: #d4a840; border: 1px solid #806020; }
+        .ovr-low { background: linear-gradient(135deg, #2d1000, #4a1a00); color: #d07040; border: 1px solid #804020; }
+
+        .tier-range {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: rgba(168, 216, 240, 0.5);
+            width: 70px;
+            flex-shrink: 0;
+        }
+
+        .tier-desc {
+            font-size: 0.85rem;
+            color: rgba(168, 216, 240, 0.55);
+        }
+
+        /* FAKTOR-KORT */
+        .factor-card {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 10px;
+            padding: 1.2rem 1.4rem;
+        }
+
+        .factor-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            margin-bottom: 0.8rem;
+        }
+
+        .factor-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .factor-table td {
+            padding: 0.35rem 0;
+            color: rgba(168, 216, 240, 0.6);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.05);
+        }
+
+        .factor-table td:last-child {
+            text-align: right;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            color: var(--ice-bright);
+        }
+
+        .factor-table tr:last-child td { border-bottom: none; }
+
+        /* RADAR-AKSE TABELL */
+        .axis-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.05);
+            font-size: 0.85rem;
+        }
+
+        .axis-row:last-child { border-bottom: none; }
+
+        .axis-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            color: var(--ice-bright);
+            width: 110px;
+            flex-shrink: 0;
+        }
+
+        .axis-cap {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            color: var(--gold);
+            width: 80px;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        .axis-desc { color: rgba(168, 216, 240, 0.5); }
+
+        .rink-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168, 216, 240, 0.12), transparent);
+            margin: 3rem 0;
+        }
+
+        footer {
+            border-top: 1px solid rgba(168, 216, 240, 0.08);
+            padding: 2rem 0;
+            color: rgba(168, 216, 240, 0.25);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+
+        .pos-tag {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(168, 216, 240, 0.1);
+            color: var(--ice);
+            border: 1px solid rgba(168, 216, 240, 0.2);
+        }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: var(--rink); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 216, 240, 0.2);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 216, 240, 0.45);
+            border: 1px solid transparent;
+        }
+        /* AD PLACEHOLDER */
+        .ad-placeholder {
+            border: 1px dashed rgba(168, 216, 240, 0.12);
+            border-radius: 8px;
+            background: rgba(168, 216, 240, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(168, 216, 240, 0.18);
+            font-family: 'Barlow Condensed', sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            gap: 0.2rem;
+        }
+
+        .ad-placeholder .ad-lbl { font-size: 0.75rem; font-weight: 700; }
+        .ad-placeholder .ad-size { font-size: 0.6rem; opacity: 0.55; }
+    </style>
+</head>
+<body class="ice-bg">
+
+    <nav>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+            <a href="index.html" class="nav-logo">NorskHockey<span>.no</span></a>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="index.html" class="nav-link">Hjem</a>
+                <a href="ehl.html" class="nav-link">EHL</a>
+                <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+                <a href="lag.html" class="nav-link">Lag</a>
+                <a href="om-rating.html" class="nav-link active">Om Rating</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 4rem;">
+
+        <!-- HERO -->
+        <div style="margin-bottom: 3rem;">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(168, 216, 240, 0.4); margin-bottom: 0.5rem;">FrostRating™</div>
+            <h1 style="font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(2.5rem, 6vw, 4rem); text-transform: uppercase; color: var(--ice-bright); line-height: 1; margin-bottom: 1rem;">Om Ratingsystemet</h1>
+            <p class="prose" style="max-width: 600px;">FrostRating er et poengbasert system som rangerer spillere og keepere på tvers av EHL og HockeyLiga1. Ratingen beregnes automatisk hver uke basert på faktiske kampdata, og tar hensyn til posisjon, kampbelastning og divisjonsnivå.</p>
+        </div>
+
+        <div class="rink-line" style="margin: 0 0 2.5rem;"></div>
+
+        <!-- SKALA -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Ratingskalaen</h2>
+            <div class="card">
+                <p class="prose" style="margin-bottom: 1.2rem;">Alle ratings normaliseres til en skala fra <strong>30 til 92</strong>. Normalisering skjer innenfor hele spillerpoolen (EHL + HL1 samlet), men med divisjonsjustering som påvirker råscoren før normalisering.</p>
+                <div>
+                    <div class="tier-row">
+                        <div class="tier-badge ovr-90">88–92</div>
+                        <div class="tier-range">88 – 92</div>
+                        <div class="tier-desc">Toppklasse — blant de aller beste i norsk ishockey denne sesongen</div>
+                    </div>
+                    <div class="tier-row">
+                        <div class="tier-badge ovr-80">78–87</div>
+                        <div class="tier-range">78 – 87</div>
+                        <div class="tier-desc">Meget god — nøkkelspiller og jevnlig bidragsyter</div>
+                    </div>
+                    <div class="tier-row">
+                        <div class="tier-badge ovr-70">68–77</div>
+                        <div class="tier-range">68 – 77</div>
+                        <div class="tier-desc">God — solid spiller over gjennomsnittet</div>
+                    </div>
+                    <div class="tier-row">
+                        <div class="tier-badge ovr-60">58–67</div>
+                        <div class="tier-range">58 – 67</div>
+                        <div class="tier-desc">Gjennomsnittlig — bidrar jevnt over sesongen</div>
+                    </div>
+                    <div class="tier-row">
+                        <div class="tier-badge ovr-low">30–57</div>
+                        <div class="tier-range">30 – 57</div>
+                        <div class="tier-desc">Under gjennomsnitt — begrenset statistisk bidrag hittil</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JUSTERINGSFAKTORER -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Justeringsfaktorer</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+                <div class="factor-card">
+                    <div class="factor-title">Pålitelighetsfaktor</div>
+                    <p class="prose" style="font-size: 0.82rem; margin-bottom: 1rem;">Spillere med få kamper kan ha oppblåste tall. Etter normalisering trekkes scoren mot bunnen (30) basert på antall kamper spilt.</p>
+                    <table class="factor-table">
+                        <tr><td>5 kamper</td><td>25 % av poengene over 30</td></tr>
+                        <tr><td>10 kamper</td><td>50 % av poengene over 30</td></tr>
+                        <tr><td>15 kamper</td><td>75 % av poengene over 30</td></tr>
+                        <tr><td>20+ kamper</td><td>Full score</td></tr>
+                    </table>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: rgba(168,216,240,0.3); font-family: 'Barlow Condensed', sans-serif;">
+                        Formel: 30 + (normalisert − 30) × min(kamper / 20, 1.0)
+                    </div>
+                </div>
+
+                <div class="factor-card">
+                    <div class="factor-title">Divisjonsfaktor</div>
+                    <p class="prose" style="font-size: 0.82rem; margin-bottom: 1rem;">EHL er det høyeste nivået i norsk ishockey. HL1-spillere får råscoren sin justert ned for å gjenspeile divisjonsnivået i den felles ratingpoolen.</p>
+                    <table class="factor-table">
+                        <tr><td>Elite Hockey League (EHL)</td><td>× 1.00</td></tr>
+                        <tr><td>HockeyLiga1 (HL1)</td><td>× 0.90</td></tr>
+                    </table>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: rgba(168,216,240,0.3); font-family: 'Barlow Condensed', sans-serif;">
+                        Beste HL1-spiller havner typisk rundt 78–83
+                    </div>
+                </div>
+
+            </div>
+            <div style="margin-top: 0.8rem; padding: 0.8rem 1rem; background: rgba(168,216,240,0.04); border: 1px solid rgba(168,216,240,0.08); border-radius: 8px; font-size: 0.82rem; color: rgba(168,216,240,0.4);">
+                En spiller som bytter klubb midt i sesongen får én selvstendig rating per lag/stint — basert kun på kampene spilt for det laget. Faktorene beregnes uavhengig for hvert stint.
+            </div>
+        </div>
+
+        <!-- SPILLERRATING -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Spillerrating</h2>
+            <p class="prose" style="margin-bottom: 1.5rem;">Formelen er posisjonssensitiv. Angripere vektes etter målproduksjon og skuddeffektivitet, mens forsvarere premieres mer for pasningsspill, overtallsarbeid og faceoff-dominans.</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+
+                <!-- ANGRIPERE -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem;">
+                        <h3 style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; color: var(--ice-bright);">Angripere</h3>
+                        <span class="pos-tag">LW</span>
+                        <span class="pos-tag">RW</span>
+                        <span class="pos-tag">CE</span>
+                    </div>
+                    <div>
+                        <div class="weight-row">
+                            <div class="weight-label">Poeng/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 100%;"></div></div>
+                            <div class="weight-pct">30%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">Mål/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 67%;"></div></div>
+                            <div class="weight-pct">20%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">Skuddprosent</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 50%;"></div></div>
+                            <div class="weight-pct">15%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">PP-poeng/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 50%;"></div></div>
+                            <div class="weight-pct">15%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">GWG/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 33%;"></div></div>
+                            <div class="weight-pct">10%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">Faceoff%</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 17%;"></div></div>
+                            <div class="weight-pct">5%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">UH-mål/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 17%;"></div></div>
+                            <div class="weight-pct">5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORSVARERE -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem;">
+                        <h3 style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; color: var(--ice-bright);">Forsvarere</h3>
+                        <span class="pos-tag">LD</span>
+                        <span class="pos-tag">RD</span>
+                    </div>
+                    <div>
+                        <div class="weight-row">
+                            <div class="weight-label">Assists/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 100%;"></div></div>
+                            <div class="weight-pct">25%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">PP-poeng/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 80%;"></div></div>
+                            <div class="weight-pct">20%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">GWG/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 80%;"></div></div>
+                            <div class="weight-pct">20%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">Faceoff%</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 80%;"></div></div>
+                            <div class="weight-pct">20%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">Poeng/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 40%;"></div></div>
+                            <div class="weight-pct">10%</div>
+                        </div>
+                        <div class="weight-row">
+                            <div class="weight-label">UH-mål/kamp</div>
+                            <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 20%;"></div></div>
+                            <div class="weight-pct">5%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RADARKART FORKLARING -->
+            <div class="card" style="margin-top: 1rem;">
+                <h3 style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; color: var(--ice-bright); margin-bottom: 1rem;">Spillerprofil-radaren</h3>
+                <p class="prose" style="margin-bottom: 1rem; font-size: 0.85rem;">Radaren på spillerprofilen viser de samme komponentene som inngår i FrostRating, normalisert mot realistiske toppverdier i norsk hockey. En akse på 100 betyr at spilleren er på toppnivå for den statistikken.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem;">
+                    <div>
+                        <div style="font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(168,216,240,0.35); margin-bottom: 0.5rem; font-family: 'Barlow Condensed', sans-serif;">Angripere (LW / RW / CE)</div>
+                        <div class="axis-row">
+                            <div class="axis-name">Poeng</div>
+                            <div class="axis-cap">Topp: 1.5/K</div>
+                            <div class="axis-desc">Totale poeng per kamp</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">Mål</div>
+                            <div class="axis-cap">Topp: 0.7/K</div>
+                            <div class="axis-desc">Mål per kamp</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">Skudd%</div>
+                            <div class="axis-cap">Topp: 25%</div>
+                            <div class="axis-desc">Andel skudd som blir mål</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">PP-poeng</div>
+                            <div class="axis-cap">Topp: 0.5/K</div>
+                            <div class="axis-desc">Overtallspoeng per kamp</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">GWG</div>
+                            <div class="axis-cap">Topp: 0.15/K</div>
+                            <div class="axis-desc">Vinnermål per kamp</div>
+                        </div>
+                        <div class="axis-row" style="border-bottom: none;">
+                            <div class="axis-name">Faceoff%</div>
+                            <div class="axis-cap">Topp: 100%</div>
+                            <div class="axis-desc">Andel vunnede faceoffs</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(168,216,240,0.35); margin-bottom: 0.5rem; font-family: 'Barlow Condensed', sans-serif;">Forsvarere (LD / RD)</div>
+                        <div class="axis-row">
+                            <div class="axis-name">Assists</div>
+                            <div class="axis-cap">Topp: 1.0/K</div>
+                            <div class="axis-desc">Assists per kamp</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">PP-poeng</div>
+                            <div class="axis-cap">Topp: 0.5/K</div>
+                            <div class="axis-desc">Overtallspoeng per kamp</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">GWG</div>
+                            <div class="axis-cap">Topp: 0.15/K</div>
+                            <div class="axis-desc">Vinnermål per kamp</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">Faceoff%</div>
+                            <div class="axis-cap">Topp: 100%</div>
+                            <div class="axis-desc">Andel vunnede faceoffs</div>
+                        </div>
+                        <div class="axis-row">
+                            <div class="axis-name">Poeng</div>
+                            <div class="axis-cap">Topp: 1.5/K</div>
+                            <div class="axis-desc">Totale poeng per kamp</div>
+                        </div>
+                        <div class="axis-row" style="border-bottom: none;">
+                            <div class="axis-name">UH-mål</div>
+                            <div class="axis-cap">Topp: 0.05/K</div>
+                            <div class="axis-desc">Undertallsmål per kamp</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KEEPERRATING -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Keeperrating</h2>
+            <p class="prose" style="margin-bottom: 1.5rem;">Keepere vurderes utelukkende på keeperspesifikke statistikker. Samme pålitelighets- og divisjonsfaktor gjelder som for utespillere.</p>
+            <div class="card">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem;">
+                    <h3 style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; color: var(--ice-bright);">Keepere</h3>
+                    <span class="pos-tag">GK</span>
+                </div>
+                <div style="max-width: 480px;">
+                    <div class="weight-row">
+                        <div class="weight-label">Redningsprosent</div>
+                        <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 100%;"></div></div>
+                        <div class="weight-pct">40%</div>
+                    </div>
+                    <div class="weight-row">
+                        <div class="weight-label">Mål imot (GAA)</div>
+                        <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 75%;"></div></div>
+                        <div class="weight-pct">30%</div>
+                    </div>
+                    <div class="weight-row">
+                        <div class="weight-label">Vinnerprosent</div>
+                        <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 50%;"></div></div>
+                        <div class="weight-pct">20%</div>
+                    </div>
+                    <div class="weight-row">
+                        <div class="weight-label">Nullet/kamp</div>
+                        <div class="weight-bar-track"><div class="weight-bar-fill" style="width: 25%;"></div></div>
+                        <div class="weight-pct">10%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; padding: 0.7rem 1rem; background: rgba(168,216,240,0.04); border: 1px solid rgba(168,216,240,0.08); border-radius: 6px; font-size: 0.8rem; color: rgba(168,216,240,0.4); font-family: 'Barlow Condensed', sans-serif;">
+                    GAA-bidraget beregnes som 1 / (GAA + 1) — lavere mål imot gir høyere score.
+                </div>
+            </div>
+        </div>
+
+        <div class="rink-line"></div>
+
+        <!-- FORKORTELSER -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Forkortelser og statistikk</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+                <div class="card">
+                    <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; color: var(--ice-bright); margin-bottom: 1rem;">Utespillere</div>
+                    <table class="factor-table">
+                        <tr><td>K</td><td>Kamper spilt</td></tr>
+                        <tr><td>M</td><td>Mål</td></tr>
+                        <tr><td>A</td><td>Assists</td></tr>
+                        <tr><td>P</td><td>Poeng (mål + assists)</td></tr>
+                        <tr><td>PIM</td><td>Penalties in Minutes — utvisningsminutter</td></tr>
+                        <tr><td>PP</td><td>Power Play — overtallsspill</td></tr>
+                        <tr><td>UH</td><td>Undertall — undertallsspill</td></tr>
+                        <tr><td>GWG</td><td>Game Winning Goal — vinnermål</td></tr>
+                        <tr><td>Skudd%</td><td>Andel skudd som blir mål</td></tr>
+                        <tr><td>OVR</td><td>Overall — FrostRating-score</td></tr>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1rem; text-transform: uppercase; color: var(--ice-bright); margin-bottom: 1rem;">Keepere</div>
+                    <table class="factor-table">
+                        <tr><td>K</td><td>Kamper spilt</td></tr>
+                        <tr><td>S</td><td>Seire</td></tr>
+                        <tr><td>T</td><td>Tap</td></tr>
+                        <tr><td>Nullet</td><td>Shutout — holdt motstanderen målløs</td></tr>
+                        <tr><td>MI</td><td>Mål imot</td></tr>
+                        <tr><td>GAA</td><td>Goals Against Average — mål imot per kamp</td></tr>
+                        <tr><td>SV%</td><td>Save Percentage — redningsprosent</td></tr>
+                        <tr><td>Red.</td><td>Redninger</td></tr>
+                        <tr><td>OVR</td><td>Overall — FrostRating-score</td></tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="rink-line"></div>
+
+        <!-- OPPDATERINGSFREKVENS -->
+        <div style="display: flex; align-items: center; gap: 1rem; color: rgba(168,216,240,0.3); font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">
+            <span style="color: rgba(168,216,240,0.2);">●</span>
+            <span>Ratings beregnes automatisk hver søndag, mandag og tirsdag kl. 02:00</span>
+        </div>
+
+    </div>
+
+    <footer>
+        <div style="max-width: 900px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between;">
+            <span>NorskHockey.no</span>
+            <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
+        </div>
+    </footer>
+
+</body>
+</html>

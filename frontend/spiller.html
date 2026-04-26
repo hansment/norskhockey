@@ -1,0 +1,804 @@
+﻿<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spillerprofil – NorskHockey.no</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ice: #a8d8f0;
+            --ice-bright: #d4f1ff;
+            --rink: #03111f;
+            --rink-mid: #071e30;
+            --rink-light: #0d2d45;
+            --gold: #f0c040;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--rink);
+            color: #e8f4fd;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+        .ice-bg {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 216, 240, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 216, 240, 0.06) 0%, transparent 50%),
+                var(--rink);
+        }
+
+        nav {
+            background: rgba(3, 17, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--ice); opacity: 0.6; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover { color: var(--ice-bright); background: rgba(168, 216, 240, 0.1); }
+
+        .back-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.4);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-block;
+            margin: 1.5rem 0;
+        }
+
+        .back-btn:hover { color: var(--ice); }
+
+        /* PLAYER HERO */
+        .player-hero {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+            margin-bottom: 2.5rem;
+        }
+
+        .player-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--rink-light);
+            border: 3px solid rgba(168, 216, 240, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: var(--ice);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .player-full-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--ice-bright);
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .player-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(168, 216, 240, 0.08);
+            color: rgba(168, 216, 240, 0.6);
+            border: 1px solid rgba(168, 216, 240, 0.12);
+        }
+
+        .meta-tag.pos {
+            background: rgba(168, 216, 240, 0.12);
+            color: var(--ice);
+            border-color: rgba(168, 216, 240, 0.2);
+        }
+
+        /* OVR CARD */
+        .ovr-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 110px;
+            height: 130px;
+            border-radius: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+
+        .ovr-card .ovr-num {
+            font-weight: 900;
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+
+        .ovr-card .ovr-lbl {
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            opacity: 0.7;
+            margin-top: 0.2rem;
+        }
+
+        .ovr-card .ovr-pos {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            opacity: 0.5;
+            margin-top: 0.1rem;
+        }
+
+        .ovr-90 { background: linear-gradient(135deg, #1a3a00, #2d6a00); color: #7fff00; border: 1px solid #4a9900; }
+        .ovr-80 { background: linear-gradient(135deg, #1a3300, #2d5a00); color: #a8e060; border: 1px solid #3a7800; }
+        .ovr-70 { background: linear-gradient(135deg, #1a2d00, #2d4a00); color: #c8d870; border: 1px solid #506000; }
+        .ovr-60 { background: linear-gradient(135deg, #2d2000, #4a3500); color: #d4a840; border: 1px solid #806020; }
+        .ovr-low { background: linear-gradient(135deg, #2d1000, #4a1a00); color: #d07040; border: 1px solid #804020; }
+
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-box {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-box .val {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--ice-bright);
+            line-height: 1;
+        }
+
+        .stat-box .lbl {
+            font-size: 0.65rem;
+            color: rgba(168, 216, 240, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 0.3rem;
+        }
+
+        /* RADAR CHART */
+        .radar-container {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            border-left: 3px solid var(--ice);
+            padding-left: 0.7rem;
+            margin-bottom: 1.2rem;
+        }
+
+        /* PER LAG TABELL */
+        .per-lag-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .per-lag-table th {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.4);
+            padding: 0.5rem 0.8rem;
+            text-align: right;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+            white-space: nowrap;
+        }
+
+        .per-lag-table th:first-child,
+        .per-lag-table th:nth-child(2),
+        .per-lag-table th:nth-child(3) { text-align: left; }
+
+        .per-lag-table td {
+            padding: 0.55rem 0.8rem;
+            text-align: right;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.05);
+            color: rgba(168, 216, 240, 0.75);
+            white-space: nowrap;
+        }
+
+        .per-lag-table td:first-child,
+        .per-lag-table td:nth-child(2),
+        .per-lag-table td:nth-child(3) { text-align: left; }
+
+        .per-lag-table td:nth-child(2) {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--ice-bright);
+        }
+
+        .per-lag-table tr:hover td { background: rgba(168, 216, 240, 0.03); }
+
+        .per-lag-table .totals-row td {
+            border-top: 1px solid rgba(168, 216, 240, 0.15);
+            border-bottom: none;
+            color: var(--ice-bright);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+        }
+
+        .div-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.65rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            background: rgba(168, 216, 240, 0.08);
+            color: rgba(168, 216, 240, 0.45);
+            border: 1px solid rgba(168, 216, 240, 0.1);
+        }
+
+        /* LITEN OVR BADGE */
+        .ovr-mini {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .ovr-mini .mini-lbl {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            opacity: 0.65;
+        }
+
+        .ovr-mini.ovr-90 { background: linear-gradient(135deg, #1a3a00, #2d6a00); color: #7fff00; border: 1px solid #4a9900; }
+        .ovr-mini.ovr-80 { background: linear-gradient(135deg, #1a3300, #2d5a00); color: #a8e060; border: 1px solid #3a7800; }
+        .ovr-mini.ovr-70 { background: linear-gradient(135deg, #1a2d00, #2d4a00); color: #c8d870; border: 1px solid #506000; }
+        .ovr-mini.ovr-60 { background: linear-gradient(135deg, #2d2000, #4a3500); color: #d4a840; border: 1px solid #806020; }
+        .ovr-mini.ovr-low { background: linear-gradient(135deg, #2d1000, #4a1a00); color: #d07040; border: 1px solid #804020; }
+
+        /* AVANSERT STATS */
+        .adv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+
+        .adv-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.06);
+            border-radius: 6px;
+        }
+
+        .adv-lbl {
+            font-size: 0.78rem;
+            color: rgba(168, 216, 240, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .adv-val {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--ice-bright);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(168, 216, 240, 0.4);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 4rem 0;
+            justify-content: center;
+        }
+
+        .loading-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--ice);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            border-top: 1px solid rgba(168, 216, 240, 0.08);
+            padding: 2rem 0;
+            color: rgba(168, 216, 240, 0.25);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: var(--rink); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 216, 240, 0.2);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 216, 240, 0.45);
+            border: 1px solid transparent;
+        }
+        /* AD PLACEHOLDER */
+        .ad-placeholder {
+            border: 1px dashed rgba(168, 216, 240, 0.12);
+            border-radius: 8px;
+            background: rgba(168, 216, 240, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(168, 216, 240, 0.18);
+            font-family: 'Barlow Condensed', sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            gap: 0.2rem;
+        }
+
+        .ad-placeholder .ad-lbl { font-size: 0.75rem; font-weight: 700; }
+        .ad-placeholder .ad-size { font-size: 0.6rem; opacity: 0.55; }
+    </style>
+</head>
+<body class="ice-bg">
+
+    <nav>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+            <a href="index.html" class="nav-logo">NorskHockey<span>.no</span></a>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="index.html" class="nav-link">Hjem</a>
+                <a href="ehl.html" class="nav-link">EHL</a>
+                <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+                <a href="lag.html" class="nav-link">Lag</a>
+                <a href="om-rating.html" class="nav-link">Om Rating</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem;" x-data="spillerProfilData()">
+
+        <a href="javascript:history.back()" class="back-btn">← Tilbake</a>
+
+        <!-- LOADING -->
+        <div x-show="laster" class="loading">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <span>Henter spillerdata...</span>
+        </div>
+
+        <div x-show="!laster" class="fade-in">
+
+            <!-- PLAYER HERO -->
+            <div class="player-hero">
+                <div class="player-avatar-large">
+                    <span x-text="spiller ? spiller.first_name[0] + spiller.last_name[0] : ''"></span>
+                </div>
+
+                <div>
+                    <div class="player-full-name" x-text="spiller ? spiller.first_name + ' ' + spiller.last_name : ''"></div>
+                    <div class="player-meta-row">
+                        <span class="meta-tag pos" x-text="spiller ? spiller.position : ''"></span>
+                        <span class="meta-tag" x-text="spiller ? spiller.team_name : ''"></span>
+                        <span class="meta-tag" x-text="spiller && spiller.division === 'EHL' ? 'Elite Hockey League' : 'HockeyLiga1'"></span>
+                    </div>
+                </div>
+
+                <div class="ovr-card" :class="ovrKlasse(spiller && spiller.ovr)">
+                    <div class="ovr-num" x-text="spiller && spiller.ovr ? spiller.ovr : '–'"></div>
+                    <div class="ovr-lbl">FrostRating</div>
+                    <div class="ovr-pos" x-text="spiller ? spiller.position : ''"></div>
+                </div>
+            </div>
+
+            <!-- NØKKELSTATISTIKK -->
+            <h2 class="section-title" style="margin-bottom: 1rem;">Sesongstatistikk</h2>
+            <div class="stats-grid" style="margin-bottom: 2.5rem;">
+                <div class="stat-box">
+                    <div class="val" x-text="spiller ? spiller.games_played : '–'"></div>
+                    <div class="lbl">Kamper</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller ? spiller.goals : '–'"></div>
+                    <div class="lbl">Mål</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller ? spiller.assists : '–'"></div>
+                    <div class="lbl">Assists</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller ? spiller.goals + spiller.assists : '–'"></div>
+                    <div class="lbl">Poeng</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller ? spiller.pim : '–'"></div>
+                    <div class="lbl">PIM</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller && spiller.shot_pct ? (spiller.shot_pct * 100).toFixed(1) + '%' : '–'"></div>
+                    <div class="lbl">Skudd%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller ? spiller.gwg : '–'"></div>
+                    <div class="lbl">GWG</div>
+                </div>
+                <div class="stat-box">
+                    <div class="val" x-text="spiller && spiller.games_played > 0 ? ((spiller.goals + spiller.assists) / spiller.games_played).toFixed(2) : '–'"></div>
+                    <div class="lbl">P/Kamp</div>
+                </div>
+            </div>
+
+            <!-- PER LAG / SESONG -->
+            <div x-show="perLag.length > 0" style="margin-bottom: 2.5rem;">
+                <h2 class="section-title">Statistikk per lag</h2>
+                <div style="background: var(--rink-mid); border: 1px solid rgba(168, 216, 240, 0.08); border-radius: 12px; overflow: hidden;">
+                    <div style="overflow-x: auto;">
+                        <table class="per-lag-table">
+                            <thead>
+                                <tr>
+                                    <th>Sesong</th>
+                                    <th>Lag</th>
+                                    <th>Div</th>
+                                    <th>K</th>
+                                    <th>M</th>
+                                    <th>A</th>
+                                    <th>P</th>
+                                    <th>PIM</th>
+                                    <th>PP</th>
+                                    <th>UH</th>
+                                    <th>Skudd</th>
+                                    <th>Skudd%</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="rad in perLag" :key="rad.team_name + rad.season">
+                                    <tr>
+                                        <td x-text="rad.season"></td>
+                                        <td x-text="rad.team_name"></td>
+                                        <td><span class="div-badge" x-text="rad.division"></span></td>
+                                        <td x-text="rad.games_played"></td>
+                                        <td x-text="rad.goals"></td>
+                                        <td x-text="rad.assists"></td>
+                                        <td x-text="rad.points"></td>
+                                        <td x-text="rad.pim"></td>
+                                        <td x-text="(rad.pp_goals || 0) + (rad.pp_assists || 0)"></td>
+                                        <td x-text="rad.sh_goals || 0"></td>
+                                        <td x-text="rad.shots || 0"></td>
+                                        <td x-text="rad.shot_pct ? (rad.shot_pct * 100).toFixed(1) + '%' : '–'"></td>
+                                        <td>
+                                            <span class="ovr-mini" :class="ovrKlasse(rad.ovr)" x-show="rad.ovr">
+                                                <span x-text="rad.ovr ? rad.ovr.toFixed(1) : ''"></span>
+                                                <span class="mini-lbl">OVR</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template x-if="perLag.length > 1">
+                                    <tr class="totals-row">
+                                        <td colspan="3">Totalt</td>
+                                        <td x-text="spiller ? spiller.games_played : ''"></td>
+                                        <td x-text="spiller ? spiller.goals : ''"></td>
+                                        <td x-text="spiller ? spiller.assists : ''"></td>
+                                        <td x-text="spiller ? spiller.goals + spiller.assists : ''"></td>
+                                        <td x-text="spiller ? spiller.pim : ''"></td>
+                                        <td x-text="spiller ? (spiller.pp_goals || 0) + (spiller.pp_assists || 0) : ''"></td>
+                                        <td x-text="spiller ? spiller.sh_goals || 0 : ''"></td>
+                                        <td x-text="spiller ? spiller.shots || 0 : ''"></td>
+                                        <td>–</td>
+                                        <td></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANNONSE LEADERBOARD - fjern kommentar når AdSense er aktivert
+            <div class="ad-placeholder" style="height: 90px; margin-bottom: 2.5rem;">
+                <span class="ad-lbl">Annonse</span>
+                <span class="ad-size">728 × 90</span>
+            </div>
+
+        -->
+            <!-- RADAR + AVANSERT -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+
+                <!-- RADAR CHART -->
+                <div class="radar-container">
+                    <h2 class="section-title">Spillerprofil</h2>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AVANSERT STATISTIKK -->
+                <div>
+                    <h2 class="section-title">Avansert statistikk</h2>
+                    <div class="adv-grid">
+                        <div class="adv-row">
+                            <span class="adv-lbl">PP Mål</span>
+                            <span class="adv-val" x-text="spiller ? spiller.pp_goals : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">PP Assists</span>
+                            <span class="adv-val" x-text="spiller ? spiller.pp_assists : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">UH Mål</span>
+                            <span class="adv-val" x-text="spiller ? spiller.sh_goals : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">UH Assists</span>
+                            <span class="adv-val" x-text="spiller ? spiller.sh_assists : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">Skudd</span>
+                            <span class="adv-val" x-text="spiller ? spiller.shots : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">Skudd/Kamp</span>
+                            <span class="adv-val" x-text="spiller && spiller.games_played > 0 ? (spiller.shots / spiller.games_played).toFixed(1) : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">Faceoff vunnet</span>
+                            <span class="adv-val" x-text="spiller && spiller.faceoff_win_pct ? (spiller.faceoff_win_pct * 100).toFixed(1) + '%' : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">Mål/Kamp</span>
+                            <span class="adv-val" x-text="spiller && spiller.games_played > 0 ? (spiller.goals / spiller.games_played).toFixed(2) : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">Assists/Kamp</span>
+                            <span class="adv-val" x-text="spiller && spiller.games_played > 0 ? (spiller.assists / spiller.games_played).toFixed(2) : '–'"></span>
+                        </div>
+                        <div class="adv-row">
+                            <span class="adv-lbl">GWG</span>
+                            <span class="adv-val" x-text="spiller ? spiller.gwg : '–'"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between;">
+            <span>NorskHockey.no</span>
+            <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
+        </div>
+    </footer>
+
+    <script>
+        const API = 'http://127.0.0.1:8000';
+        let radarChart = null;
+
+        function spillerProfilData() {
+            return {
+                spiller: null,
+                perLag: [],
+                laster: true,
+
+                async init() {
+                    const params = new URLSearchParams(window.location.search);
+                    const id = params.get('id');
+                    if (!id) { window.location.href = 'ehl.html'; return; }
+
+                    await Promise.all([
+                        this.hentSpiller(id),
+                        this.hentPerLag(id),
+                    ]);
+                    this.laster = false;
+                    this.$nextTick(() => this.byggRadar());
+                },
+
+                async hentSpiller(id) {
+                    try {
+                        const res = await fetch(`${API}/spillere/${id}`);
+                        this.spiller = await res.json();
+                    } catch(e) { console.error(e); }
+                },
+
+                async hentPerLag(id) {
+                    try {
+                        const res = await fetch(`${API}/spillere/${id}/per-lag`);
+                        this.perLag = await res.json();
+                    } catch(e) { console.error(e); }
+                },
+
+                byggRadar() {
+                    if (!this.spiller) return;
+                    const s = this.spiller;
+                    const gp = s.games_played || 1;
+                    const pos = s.position || '';
+
+                    const poengPK   = Math.min((s.goals + s.assists) / gp / 1.5 * 100, 100);
+                    const målPK     = Math.min(s.goals / gp / 0.7 * 100, 100);
+                    const assistPK  = Math.min(s.assists / gp / 1.0 * 100, 100);
+                    const skudd     = Math.min((s.shot_pct || 0) / 0.25 * 100, 100);
+                    const ppPoengPK = Math.min((s.pp_goals + s.pp_assists) / gp / 0.5 * 100, 100);
+                    const faceoff   = Math.min((s.faceoff_win_pct || 0.5) * 100, 100);
+                    const gwgPK     = Math.min(s.gwg / gp / 0.15 * 100, 100);
+                    const shMålPK   = Math.min((s.sh_goals || 0) / gp / 0.05 * 100, 100);
+
+                    const erForsvarer = ['LD', 'RD'].includes(pos);
+                    const labels = erForsvarer
+                        ? ['Assists', 'PP-poeng', 'GWG', 'Faceoff%', 'Poeng', 'UH-Mål']
+                        : ['Poeng', 'Mål', 'Skudd%', 'PP-poeng', 'GWG', 'Faceoff%'];
+                    const data = erForsvarer
+                        ? [assistPK, ppPoengPK, gwgPK, faceoff, poengPK, shMålPK]
+                        : [poengPK, målPK, skudd, ppPoengPK, gwgPK, faceoff];
+
+                    const ctx = document.getElementById('radarChart').getContext('2d');
+
+                    if (radarChart) radarChart.destroy();
+
+                    radarChart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data,
+                                backgroundColor: 'rgba(168, 216, 240, 0.12)',
+                                borderColor: 'rgba(168, 216, 240, 0.7)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(168, 216, 240, 0.9)',
+                                pointBorderColor: 'transparent',
+                                pointRadius: 4,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                r: {
+                                    min: 0,
+                                    max: 100,
+                                    ticks: {
+                                        display: false,
+                                        stepSize: 25,
+                                    },
+                                    grid: {
+                                        color: 'rgba(168, 216, 240, 0.08)',
+                                    },
+                                    angleLines: {
+                                        color: 'rgba(168, 216, 240, 0.08)',
+                                    },
+                                    pointLabels: {
+                                        color: 'rgba(168, 216, 240, 0.6)',
+                                        font: {
+                                            family: 'Barlow Condensed',
+                                            size: 13,
+                                            weight: '700',
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => ` ${Math.round(ctx.raw)}/100`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+
+                ovrKlasse(ovr) {
+                    if (!ovr) return 'ovr-low';
+                    if (ovr >= 88) return 'ovr-90';
+                    if (ovr >= 78) return 'ovr-80';
+                    if (ovr >= 68) return 'ovr-70';
+                    if (ovr >= 58) return 'ovr-60';
+                    return 'ovr-low';
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

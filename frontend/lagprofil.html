@@ -1,0 +1,579 @@
+﻿<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lagprofil – NorskHockey.no</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ice: #a8d8f0;
+            --ice-bright: #d4f1ff;
+            --rink: #03111f;
+            --rink-mid: #071e30;
+            --rink-light: #0d2d45;
+            --gold: #f0c040;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--rink);
+            color: #e8f4fd;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+        .ice-bg {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 216, 240, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 216, 240, 0.06) 0%, transparent 50%),
+                var(--rink);
+        }
+
+        nav {
+            background: rgba(3, 17, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--ice); opacity: 0.6; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--ice-bright);
+            background: rgba(168, 216, 240, 0.1);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.4);
+            text-decoration: none;
+            transition: color 0.2s;
+            margin-bottom: 1.5rem;
+            margin-top: 1.5rem;
+            display: block;
+        }
+
+        .back-btn:hover { color: var(--ice); }
+
+        .team-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .team-logo-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            background: var(--rink-light);
+            border: 1px solid rgba(168, 216, 240, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--ice);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .team-logo-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .team-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--ice-bright);
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .team-division {
+            font-size: 0.85rem;
+            color: rgba(168, 216, 240, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.4rem;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 0.4rem;
+            background: rgba(168, 216, 240, 0.05);
+            padding: 0.3rem;
+            border-radius: 6px;
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            width: fit-content;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.45rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: rgba(168, 216, 240, 0.5);
+            border: none;
+        }
+
+        .tab-btn.active {
+            background: rgba(168, 216, 240, 0.12);
+            color: var(--ice-bright);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.35);
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table th:hover { color: rgba(168, 216, 240, 0.6); }
+        .data-table th.sorted { color: var(--ice); }
+
+        .data-table td {
+            padding: 0.65rem 0.8rem;
+            font-size: 0.88rem;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.04);
+            color: rgba(232, 244, 253, 0.8);
+            white-space: nowrap;
+        }
+
+        .data-table tr { transition: background 0.15s; cursor: pointer; }
+        .data-table tr:hover td { background: rgba(168, 216, 240, 0.04); }
+
+        .data-table .name-cell {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--ice-bright);
+        }
+
+        .pos-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            padding: 0.12rem 0.35rem;
+            border-radius: 3px;
+            background: rgba(168, 216, 240, 0.08);
+            color: var(--ice);
+            border: 1px solid rgba(168, 216, 240, 0.15);
+        }
+
+        .ovr-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            width: 42px;
+            height: 42px;
+            border-radius: 5px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .ovr-badge .ovr-label {
+            font-size: 0.42rem;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            margin-top: 1px;
+        }
+
+        .ovr-90 { background: linear-gradient(135deg, #1a3a00, #2d6a00); color: #7fff00; border: 1px solid #4a9900; }
+        .ovr-80 { background: linear-gradient(135deg, #1a3300, #2d5a00); color: #a8e060; border: 1px solid #3a7800; }
+        .ovr-70 { background: linear-gradient(135deg, #1a2d00, #2d4a00); color: #c8d870; border: 1px solid #506000; }
+        .ovr-60 { background: linear-gradient(135deg, #2d2000, #4a3500); color: #d4a840; border: 1px solid #806020; }
+        .ovr-low { background: linear-gradient(135deg, #2d1000, #4a1a00); color: #d07040; border: 1px solid #804020; }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--rink-light);
+            border: 1px solid rgba(168, 216, 240, 0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--ice);
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(168, 216, 240, 0.4);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 3rem 0;
+            justify-content: center;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--ice);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            border-top: 1px solid rgba(168, 216, 240, 0.08);
+            padding: 2rem 0;
+            color: rgba(168, 216, 240, 0.25);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: var(--rink); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 216, 240, 0.2);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 216, 240, 0.45);
+            border: 1px solid transparent;
+        }
+        /* AD PLACEHOLDER */
+        .ad-placeholder {
+            border: 1px dashed rgba(168, 216, 240, 0.12);
+            border-radius: 8px;
+            background: rgba(168, 216, 240, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(168, 216, 240, 0.18);
+            font-family: 'Barlow Condensed', sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            gap: 0.2rem;
+        }
+
+        .ad-placeholder .ad-lbl { font-size: 0.75rem; font-weight: 700; }
+        .ad-placeholder .ad-size { font-size: 0.6rem; opacity: 0.55; }
+    </style>
+</head>
+<body class="ice-bg">
+
+    <nav>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+            <a href="index.html" class="nav-logo">NorskHockey<span>.no</span></a>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <a href="index.html" class="nav-link">Hjem</a>
+                <a href="ehl.html" class="nav-link">EHL</a>
+                <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+                <a href="lag.html" class="nav-link active">Lag</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem;" x-data="lagProfilData()">
+
+        <a href="lag.html" class="back-btn">← Tilbake til lag</a>
+
+        <!-- LOADING -->
+        <div x-show="laster" class="loading">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <span>Henter laginfo...</span>
+        </div>
+
+        <!-- TEAM HEADER -->
+        <div x-show="!laster" class="fade-in">
+            <div class="team-header">
+                <div class="team-logo-large">
+                    <img x-show="lag && lag.logo" :src="lag && lag.logo" @error="$el.style.display='none'">
+                    <span x-show="!lag || !lag.logo" x-text="lag ? lag.name.substring(0, 2).toUpperCase() : ''"></span>
+                </div>
+                <div>
+                    <div class="team-name" x-text="lag ? lag.name : ''"></div>
+                    <div class="team-division" x-text="lag && lag.division === 'EHL' ? 'Elite Hockey League' : 'HockeyLiga1'"></div>
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <div class="tab-group">
+                <button class="tab-btn" :class="{ active: visning === 'spillere' }" @click="visning = 'spillere'">Spillere</button>
+                <button class="tab-btn" :class="{ active: visning === 'keepere' }" @click="visning = 'keepere'">Keepere</button>
+            </div>
+
+            <!-- SPILLERE TABELL -->
+            <div x-show="visning === 'spillere'">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th @click="sorter('ovr')" :class="{ sorted: sortFelt === 'ovr' }">OVR ↕</th>
+                            <th>Spiller</th>
+                            <th>Pos</th>
+                            <th @click="sorter('games_played')" :class="{ sorted: sortFelt === 'games_played' }">KP ↕</th>
+                            <th @click="sorter('goals')" :class="{ sorted: sortFelt === 'goals' }">MÅL ↕</th>
+                            <th @click="sorter('assists')" :class="{ sorted: sortFelt === 'assists' }">ASS ↕</th>
+                            <th @click="sorter('points')" :class="{ sorted: sortFelt === 'points' }">PTS ↕</th>
+                            <th @click="sorter('pim')" :class="{ sorted: sortFelt === 'pim' }">PIM ↕</th>
+                            <th @click="sorter('shot_pct')" :class="{ sorted: sortFelt === 'shot_pct' }">SKD% ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(spiller, index) in sortertSpillere" :key="spiller.person_id">
+                            <tr @click="window.location.href = `spiller.html?id=${spiller.person_id}`">
+                                <td style="color: rgba(168,216,240,0.2); text-align:center;" x-text="index + 1"></td>
+                                <td>
+                                    <div class="ovr-badge" :class="ovrKlasse(spiller.ovr)">
+                                        <span x-text="spiller.ovr ?? '–'"></span>
+                                        <span class="ovr-label">OVR</span>
+                                    </div>
+                                </td>
+                                <td class="name-cell">
+                                    <div class="avatar" x-text="spiller.first_name[0] + spiller.last_name[0]"></div>
+                                    <span x-text="spiller.first_name + ' ' + spiller.last_name"></span>
+                                </td>
+                                <td><span class="pos-badge" x-text="spiller.position || '–'"></span></td>
+                                <td x-text="spiller.games_played"></td>
+                                <td x-text="spiller.goals"></td>
+                                <td x-text="spiller.assists"></td>
+                                <td x-text="spiller.goals + spiller.assists"></td>
+                                <td x-text="spiller.pim"></td>
+                                <td x-text="spiller.shot_pct ? (spiller.shot_pct * 100).toFixed(1) + '%' : '–'"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- KEEPERE TABELL -->
+            <div x-show="visning === 'keepere'">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th>OVR</th>
+                            <th>Keeper</th>
+                            <th @click="sorterKeeper('games_played')" :class="{ sorted: sortFelt === 'games_played' }">KP ↕</th>
+                            <th @click="sorterKeeper('save_pct')" :class="{ sorted: sortFelt === 'save_pct' }">SV% ↕</th>
+                            <th @click="sorterKeeper('goals_against_avg')" :class="{ sorted: sortFelt === 'goals_against_avg' }">GAA ↕</th>
+                            <th @click="sorterKeeper('wins')" :class="{ sorted: sortFelt === 'wins' }">W ↕</th>
+                            <th @click="sorterKeeper('losses')" :class="{ sorted: sortFelt === 'losses' }">L ↕</th>
+                            <th @click="sorterKeeper('shutouts')" :class="{ sorted: sortFelt === 'shutouts' }">SO ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(keeper, index) in sortertKeepere" :key="keeper.person_id">
+                            <tr @click="window.location.href = `keeper.html?id=${keeper.person_id}`">
+                                <td style="color: rgba(168,216,240,0.2); text-align:center;" x-text="index + 1"></td>
+                                <td>
+                                    <div class="ovr-badge" :class="ovrKlasse(keeper.ovr)">
+                                        <span x-text="keeper.ovr ?? '–'"></span>
+                                        <span class="ovr-label">OVR</span>
+                                    </div>
+                                </td>
+                                <td class="name-cell">
+                                    <div class="avatar" x-text="keeper.first_name[0] + keeper.last_name[0]"></div>
+                                    <span x-text="keeper.first_name + ' ' + keeper.last_name"></span>
+                                </td>
+                                <td x-text="keeper.games_played"></td>
+                                <td x-text="keeper.save_pct ? (keeper.save_pct * 100).toFixed(1) + '%' : '–'"></td>
+                                <td x-text="keeper.goals_against_avg ? keeper.goals_against_avg.toFixed(2) : '–'"></td>
+                                <td x-text="keeper.wins"></td>
+                                <td x-text="keeper.losses"></td>
+                                <td x-text="keeper.shutouts"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between;">
+            <span>NorskHockey.no</span>
+            <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
+        </div>
+    </footer>
+
+    <script>
+        const API = 'http://127.0.0.1:8000';
+
+        function lagProfilData() {
+            return {
+                lag: null,
+                spillere: [],
+                keepere: [],
+                laster: true,
+                visning: 'spillere',
+                sortFelt: 'ovr',
+                sortStigende: false,
+
+                async init() {
+                    const params = new URLSearchParams(window.location.search);
+                    const id = params.get('id');
+                    if (!id) { window.location.href = 'lag.html'; return; }
+
+                    await this.hentLag(id);
+                    await this.hentSpillere(id);
+                    await this.hentKeepere(id);
+                    this.laster = false;
+                },
+
+                async hentLag(id) {
+                    try {
+                        const res = await fetch(`${API}/lag/${id}`);
+                        this.lag = await res.json();
+                    } catch(e) { console.error(e); }
+                },
+
+                async hentSpillere(id) {
+                    try {
+                        const res = await fetch(`${API}/spillere`);
+                        const alle = await res.json();
+                        this.spillere = alle.filter(s => s.team_id == id);
+                    } catch(e) { console.error(e); }
+                },
+
+                async hentKeepere(id) {
+                    try {
+                        const res = await fetch(`${API}/keepere`);
+                        const alle = await res.json();
+                        this.keepere = alle.filter(k => k.team_id == id);
+                    } catch(e) { console.error(e); }
+                },
+
+                sorter(felt) {
+                    if (this.sortFelt === felt) {
+                        this.sortStigende = !this.sortStigende;
+                    } else {
+                        this.sortFelt = felt;
+                        this.sortStigende = false;
+                    }
+                },
+
+                sorterKeeper(felt) { this.sorter(felt); },
+
+                get sortertSpillere() {
+                    return [...this.spillere].sort((a, b) => {
+                        const av = a[this.sortFelt] ?? -1;
+                        const bv = b[this.sortFelt] ?? -1;
+                        return this.sortStigende ? av - bv : bv - av;
+                    });
+                },
+
+                get sortertKeepere() {
+                    return [...this.keepere].sort((a, b) => {
+                        const av = a[this.sortFelt] ?? -1;
+                        const bv = b[this.sortFelt] ?? -1;
+                        return this.sortStigende ? av - bv : bv - av;
+                    });
+                },
+
+                ovrKlasse(ovr) {
+                    if (ovr >= 88) return 'ovr-90';
+                    if (ovr >= 78) return 'ovr-80';
+                    if (ovr >= 68) return 'ovr-70';
+                    if (ovr >= 58) return 'ovr-60';
+                    return 'ovr-low';
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
