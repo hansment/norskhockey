@@ -423,6 +423,7 @@
 
             <!-- SPILLERE TABELL -->
             <div x-show="visning === 'spillere'">
+                <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -463,10 +464,12 @@
                         </template>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <!-- KEEPERE TABELL -->
             <div x-show="visning === 'keepere'">
+                <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -505,6 +508,7 @@
                         </template>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
