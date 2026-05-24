@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyheter – NorskHockey.gg</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ice: #a8d8f0;
+            --ice-bright: #d4f1ff;
+            --rink: #03111f;
+            --rink-mid: #071e30;
+            --rink-light: #0d2d45;
+            --gold: #f0c040;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--rink);
+            color: #e8f4fd;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+        .ice-bg {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 216, 240, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 216, 240, 0.06) 0%, transparent 50%),
+                var(--rink);
+        }
+
+        nav {
+            background: rgba(3, 17, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--ice); opacity: 0.6; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--ice-bright);
+            background: rgba(168, 216, 240, 0.1);
+        }
+
+        .page-header {
+            padding: 2.5rem 0 2rem;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            text-transform: uppercase;
+            color: var(--ice-bright);
+            line-height: 1;
+        }
+
+        .page-title .sub {
+            font-size: 0.4em;
+            color: rgba(168, 216, 240, 0.4);
+            letter-spacing: 0.15em;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        /* ARTIKKEL KORT */
+        .artikkel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .artikkel-kort {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .artikkel-kort:hover {
+            border-color: rgba(168, 216, 240, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .artikkel-bilde {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--rink-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .artikkel-bilde-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--rink-light), var(--rink-mid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .artikkel-innhold {
+            padding: 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .artikkel-dato {
+            font-size: 0.72rem;
+            color: rgba(168, 216, 240, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+        }
+
+        .artikkel-tittel {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--ice-bright);
+            line-height: 1.2;
+            margin-bottom: 0.6rem;
+        }
+
+        .artikkel-ingress {
+            font-size: 0.85rem;
+            color: rgba(168, 216, 240, 0.55);
+            line-height: 1.5;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .artikkel-forfatter {
+            font-size: 0.75rem;
+            color: rgba(168, 216, 240, 0.35);
+            margin-top: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* PAGINERING */
+        .paginering {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .side-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(168, 216, 240, 0.06);
+            color: rgba(168, 216, 240, 0.5);
+            border: 1px solid rgba(168, 216, 240, 0.1);
+        }
+
+        .side-btn:hover, .side-btn.active {
+            background: rgba(168, 216, 240, 0.12);
+            color: var(--ice-bright);
+            border-color: rgba(168, 216, 240, 0.25);
+        }
+
+        .side-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ENKELT ARTIKKEL VISNING */
+        .artikkel-full {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .artikkel-full-bilde {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .artikkel-full-tittel {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--ice-bright);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .artikkel-full-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.78rem;
+            color: rgba(168, 216, 240, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(168, 216, 240, 0.08);
+        }
+
+        .artikkel-full-innhold {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: rgba(232, 244, 253, 0.85);
+        }
+
+        .artikkel-full-innhold h1,
+        .artikkel-full-innhold h2,
+        .artikkel-full-innhold h3 {
+            font-family: 'Barlow Condensed', sans-serif;
+            color: var(--ice-bright);
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .artikkel-full-innhold p { margin-bottom: 1rem; }
+        .artikkel-full-innhold img { max-width: 100%; border-radius: 6px; margin: 1rem 0; }
+        .artikkel-full-innhold a { color: var(--ice); }
+        .artikkel-full-innhold ul, .artikkel-full-innhold ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+
+        .tilbake-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.4);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-block;
+            margin: 1.5rem 0;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .tilbake-btn:hover { color: var(--ice); }
+
+        .ingen-artikler {
+            text-align: center;
+            padding: 4rem 0;
+            color: rgba(168, 216, 240, 0.3);
+        }
+
+        .ingen-artikler .ikon { font-size: 3rem; margin-bottom: 1rem; }
+
+        .ingen-artikler p {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(168, 216, 240, 0.4);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 3rem 0;
+            justify-content: center;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--ice);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            border-top: 1px solid rgba(168, 216, 240, 0.08);
+            padding: 2rem 0;
+            color: rgba(168, 216, 240, 0.25);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--rink); }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 216, 240, 0.2); border-radius: 3px; }
+    </style>
+</head>
+<body class="ice-bg">
+
+    <nav>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+            <a href="index.html" class="nav-logo">NorskHockey<span>.no</span></a>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <a href="index.html" class="nav-link">Hjem</a>
+                <a href="ehl.html" class="nav-link">EHL</a>
+                <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+                <a href="lag.html" class="nav-link">Lag</a>
+                <a href="innlegg.html" class="nav-link active">Nyheter</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem;" x-data="nyheterData()">
+
+        <!-- LISTE VISNING -->
+        <div x-show="!valgtArtikkel">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <span class="sub">Norsk Ishockey</span>
+                    Nyheter
+                </h1>
+            </div>
+
+            <div x-show="laster" class="loading">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <span>Henter nyheter...</span>
+            </div>
+
+            <div x-show="!laster && artikler.length === 0" class="ingen-artikler">
+                <div class="ikon">🏒</div>
+                <p>Ingen nyheter publisert ennå</p>
+            </div>
+
+            <div x-show="!laster && artikler.length > 0" class="fade-in">
+                <div class="artikkel-grid">
+                    <template x-for="artikkel in artikler" :key="artikkel.id">
+                        <div class="artikkel-kort" @click="åpneArtikkel(artikkel)">
+                            <div x-show="artikkel.image_url">
+                                <img :src="artikkel.image_url" :alt="artikkel.title" class="artikkel-bilde" @error="$el.style.display='none'">
+                            </div>
+                            <div x-show="!artikkel.image_url" class="artikkel-bilde-placeholder">🏒</div>
+                            <div class="artikkel-innhold">
+                                <div class="artikkel-dato" x-text="formaterDato(artikkel.created_at)"></div>
+                                <div class="artikkel-tittel" x-text="artikkel.title"></div>
+                                <div class="artikkel-ingress" x-html="artikkel.content"></div>
+                                <div class="artikkel-forfatter" x-text="'Av ' + artikkel.author"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- PAGINERING -->
+                <div class="paginering" x-show="totalSider > 1">
+                    <button class="side-btn" @click="byttSide(side - 1)" :disabled="side === 1">← Forrige</button>
+                    <template x-for="s in totalSider" :key="s">
+                        <button class="side-btn" :class="{ active: s === side }" @click="byttSide(s)" x-text="s"></button>
+                    </template>
+                    <button class="side-btn" @click="byttSide(side + 1)" :disabled="side === totalSider">Neste →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENKELT ARTIKKEL -->
+        <div x-show="valgtArtikkel" class="fade-in">
+            <button class="tilbake-btn" @click="valgtArtikkel = null">← Tilbake til nyheter</button>
+
+            <div class="artikkel-full" x-show="valgtArtikkel">
+                <img x-show="valgtArtikkel && valgtArtikkel.image_url"
+                     :src="valgtArtikkel && valgtArtikkel.image_url"
+                     :alt="valgtArtikkel && valgtArtikkel.title"
+                     class="artikkel-full-bilde">
+
+                <h1 class="artikkel-full-tittel" x-text="valgtArtikkel && valgtArtikkel.title"></h1>
+
+                <div class="artikkel-full-meta">
+                    <span x-text="valgtArtikkel && formaterDato(valgtArtikkel.created_at)"></span>
+                    <span>·</span>
+                    <span x-text="valgtArtikkel && 'Av ' + valgtArtikkel.author"></span>
+                </div>
+
+                <div class="artikkel-full-innhold" x-html="valgtArtikkel && valgtArtikkel.content"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between;">
+            <span>NorskHockey.no</span>
+            <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
+        </div>
+    </footer>
+
+    <script>
+        const API = 'https://web-production-3e3870.up.railway.app';
+
+        function nyheterData() {
+            return {
+                artikler: [],
+                valgtArtikkel: null,
+                laster: true,
+                side: 1,
+                totalSider: 1,
+
+                async init() {
+                    await this.hentArtikler();
+                },
+
+                async hentArtikler() {
+                    this.laster = true;
+                    try {
+                        const res = await fetch(`${API}/artikler?side=${this.side}`);
+                        const data = await res.json();
+                        this.artikler = data.artikler;
+                        this.totalSider = data.sider || 1;
+                    } catch(e) {
+                        console.error(e);
+                    } finally {
+                        this.laster = false;
+                    }
+                },
+
+                async byttSide(nyeSide) {
+                    if (nyeSide < 1 || nyeSide > this.totalSider) return;
+                    this.side = nyeSide;
+                    await this.hentArtikler();
+                    window.scrollTo(0, 0);
+                },
+
+                åpneArtikkel(artikkel) {
+                    this.valgtArtikkel = artikkel;
+                    window.scrollTo(0, 0);
+                },
+
+                formaterDato(isoString) {
+                    if (!isoString) return '';
+                    const dato = new Date(isoString);
+                    return dato.toLocaleDateString('no-NO', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
