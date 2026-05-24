@@ -96,6 +96,20 @@ def init_db():
         )
     """)
 
+    # Artikkel-tabell
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS articles (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            title       TEXT NOT NULL,
+            content     TEXT NOT NULL,
+            image_url   TEXT,
+            author      TEXT,
+            created_at  TEXT,
+            updated_at  TEXT,
+            published   INTEGER DEFAULT 0
+        )
+    """)
+
     # Sync-log tabell
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sync_log (

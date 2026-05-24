@@ -5,6 +5,7 @@ from backend.database import init_db
 from backend import sync
 from backend.routes.players import router as players_router
 from backend.routes.teams import router as teams_router
+from backend.routes.articles import router as articles_router
 import threading
 
 @asynccontextmanager
@@ -17,6 +18,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(players_router)
 app.include_router(teams_router)
+app.include_router(articles_router)
 
 app.add_middleware(
     CORSMiddleware,

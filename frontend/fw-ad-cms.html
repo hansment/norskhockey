@@ -6,7 +6,8 @@
     <title>Admin – NorskHockey.no</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -384,8 +385,7 @@
 
                     <div class="form-gruppe">
                         <label class="form-label">Innhold</label>
-                        <textarea id="editor" x-model="form.content" style="display:none;"></textarea>
-                        <div id="tinymce-container" style="border-radius: 6px; overflow: hidden;"></div>
+                        <div id="quill-editor" style="height: 300px; background: rgba(168,216,240,0.06); border: 1px solid rgba(168,216,240,0.12); border-radius: 6px; color: var(--ice-bright);"></div>
                     </div>
 
                     <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem; flex-wrap: wrap;">
@@ -462,24 +462,22 @@
                 },
 
                 async init() {
-                    // Init TinyMCE
+                    // Init Quill
                     setTimeout(() => {
-                        tinymce.init({
-                            selector: '#editor',
-                            target: document.getElementById('tinymce-container'),
-                            inline: false,
-                            skin: 'oxide-dark',
-                            content_css: 'dark',
-                            plugins: 'lists link image media table code',
-                            toolbar: 'undo redo | bold italic | h2 h3 | bullist numlist | link image | code',
-                            menubar: false,
-                            height: 400,
-                            setup: (ed) => {
-                                editor = ed;
-                                ed.on('change', () => {
-                                    this.form.content = ed.getContent();
-                                });
+                        editor = new Quill('#quill-editor', {
+                            theme: 'snow',
+                            modules: {
+                                toolbar: [
+                                    ['bold', 'italic', 'underline'],
+                                    [{ 'header': [2, 3, false] }],
+                                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                    ['link', 'image'],
+                                    ['clean']
+                                ]
                             }
+                        });
+                        editor.on('text-change', () => {
+                            this.form.content = editor.root.innerHTML;
                         });
                     }, 500);
                 },
@@ -510,10 +508,6 @@
                     if (!this.form.title) {
                         this.visMelding('Tittel er påkrevd', 'feil');
                         return;
-                    }
-
-                    if (editor) {
-                        this.form.content = editor.getContent();
                     }
 
                     const artikkel = { ...this.form, published: publisert };
@@ -559,14 +553,14 @@
                         image_url: artikkel.image_url,
                         published: artikkel.published
                     };
-                    if (editor) editor.setContent(artikkel.content);
+                    if (editor) editor.clipboard.dangerouslyPasteHTML(artikkel.content);
                     window.scrollTo(0, 0);
                 },
 
                 nullstillForm() {
                     this.redigerer = null;
                     this.form = { title: '', content: '', author: 'Redaksjonen', image_url: null, published: 0 };
-                    if (editor) editor.setContent('');
+                    if (editor) editor.setContents([]);
                 },
 
                 async lastOppBilde(event) {
