@@ -659,11 +659,17 @@
                 divisjon: 'EHL',
                 spillere: [],
                 keepere: [],
+                sesong: null,
                 laster: true,
                 lasterKeepere: true,
                 syncStatus: 'Henter status...',
 
                 async init() {
+                    try {
+                        const res = await fetch(`${API}/sesonger`);
+                        const sesonger = await res.json();
+                        if (sesonger.length > 0) this.sesong = sesonger[0];
+                    } catch(e) {}
                     await this.hentSpillere();
                     await this.hentKeepere();
                     await this.hentSyncStatus();
@@ -679,9 +685,10 @@
 
                 async hentSpillere() {
                     try {
-                        const res = await fetch(`${API}/spillere?divisjon=${this.divisjon}`);
+                        const params = new URLSearchParams({ divisjon: this.divisjon });
+                        if (this.sesong) params.append('sesong', this.sesong);
+                        const res = await fetch(`${API}/spillere?${params}`);
                         const data = await res.json();
-                        // Sorter på OVR og ta topp 5
                         this.spillere = data
                             .filter(s => s.ovr !== null)
                             .sort((a, b) => b.ovr - a.ovr)
@@ -695,7 +702,9 @@
 
                 async hentKeepere() {
                     try {
-                        const res = await fetch(`${API}/keepere?divisjon=${this.divisjon}`);
+                        const params = new URLSearchParams({ divisjon: this.divisjon });
+                        if (this.sesong) params.append('sesong', this.sesong);
+                        const res = await fetch(`${API}/keepere?${params}`);
                         const data = await res.json();
                         this.keepere = data
                             .filter(k => k.ovr !== null)
