@@ -13,6 +13,7 @@ idna==3.11
 pydantic==2.13.3
 pydantic_core==2.46.3
 python-dotenv==1.2.2
+python-multipart==0.0.29
 requests==2.33.1
 six==1.17.0
 starlette==1.0.0
