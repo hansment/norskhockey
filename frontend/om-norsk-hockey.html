@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D3C1S24NFF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-D3C1S24NFF');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om NorskHockey – NorskHockey.no</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ice: #a8d8f0;
+            --ice-bright: #d4f1ff;
+            --rink: #03111f;
+            --rink-mid: #071e30;
+            --rink-light: #0d2d45;
+            --gold: #f0c040;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--rink);
+            color: #e8f4fd;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+        .ice-bg {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 216, 240, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 216, 240, 0.06) 0%, transparent 50%),
+                var(--rink);
+        }
+
+        nav {
+            background: rgba(3, 17, 31, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(168, 216, 240, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--ice); opacity: 0.6; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active { color: var(--ice-bright); background: rgba(168, 216, 240, 0.1); }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ice-bright);
+            border-left: 3px solid var(--ice);
+            padding-left: 0.7rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .card {
+            background: var(--rink-mid);
+            border: 1px solid rgba(168, 216, 240, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .prose {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: rgba(232, 244, 253, 0.75);
+        }
+
+        .prose strong { color: var(--ice-bright); font-weight: 600; }
+
+        .rink-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168, 216, 240, 0.15), transparent);
+            margin: 2.5rem 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            color: rgba(232, 244, 253, 0.75);
+            line-height: 1.5;
+        }
+
+        .feature-list li::before {
+            content: '—';
+            color: var(--ice);
+            opacity: 0.5;
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--ice);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            padding: 0.3rem 0;
+        }
+
+        .contact-link:hover { color: var(--ice-bright); }
+
+        .contact-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(168, 216, 240, 0.35);
+            margin-bottom: 0.3rem;
+        }
+
+        .contact-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        footer {
+            border-top: 1px solid rgba(168, 216, 240, 0.08);
+            padding: 2rem 0;
+            color: rgba(168, 216, 240, 0.25);
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 4rem;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--rink); }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 216, 240, 0.2); border-radius: 3px; }
+
+        /* MOBILE */
+        .nav-links { display: flex; gap: 0.5rem; align-items: center; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; background: transparent; border: none; cursor: pointer; padding: 6px 4px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: rgba(168,216,240,0.7); border-radius: 1px; transition: transform 0.2s, opacity 0.2s; }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        .nav-mobile-menu { background: rgba(3,17,31,0.98); border-top: 1px solid rgba(168,216,240,0.08); padding: 0.5rem 1.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.15rem; }
+        .nav-mobile-menu .nav-link { padding: 0.65rem 0.8rem; }
+        .footer-inner { display: flex; justify-content: space-between; align-items: center; }
+        @media (max-width: 640px) {
+            .nav-links { display: none !important; }
+            .hamburger { display: flex; }
+            .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+        }
+    </style>
+</head>
+<body class="ice-bg">
+
+    <nav x-data="{ menuOpen: false }">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+            <a href="index.html" class="nav-logo">NorskHockey<span>.no</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Hjem</a>
+                <a href="ehl.html" class="nav-link">EHL</a>
+                <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+                <a href="lag.html" class="nav-link">Lag</a>
+                <a href="om-rating.html" class="nav-link">Om Rating</a>
+                <a href="innlegg.html" class="nav-link">Nyheter</a>
+                <a href="om-norsk-hockey.html" class="nav-link active">Om oss</a>
+            </div>
+            <button class="hamburger" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="Meny">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="nav-mobile-menu" x-show="menuOpen" @click.outside="menuOpen = false" style="display: none;">
+            <a href="index.html" class="nav-link">Hjem</a>
+            <a href="ehl.html" class="nav-link">EHL</a>
+            <a href="hl1.html" class="nav-link">HockeyLiga1</a>
+            <a href="lag.html" class="nav-link">Lag</a>
+            <a href="om-rating.html" class="nav-link">Om Rating</a>
+            <a href="innlegg.html" class="nav-link">Nyheter</a>
+            <a href="om-norsk-hockey.html" class="nav-link active">Om oss</a>
+        </div>
+    </nav>
+
+    <div style="max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 4rem;">
+
+        <!-- HERO -->
+        <div style="margin-bottom: 3rem;">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(168, 216, 240, 0.4); margin-bottom: 0.5rem;">NorskHockey.no</div>
+            <h1 style="font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(2.5rem, 6vw, 4rem); text-transform: uppercase; color: var(--ice-bright); line-height: 1; margin-bottom: 1rem;">Om NorskHockey</h1>
+            <p class="prose" style="max-width: 640px;">NorskHockey.no er et uavhengig hockeyprosjekt med mål om å samle statistikk, analyser, nyheter og innsikt om norsk ishockey på ett sted.</p>
+        </div>
+
+        <div class="rink-line" style="margin: 0 0 2.5rem;"></div>
+
+        <!-- OM PROSJEKTET -->
+        <div style="margin-bottom: 2.5rem;">
+            <div class="card">
+                <p class="prose">Prosjektet drives og utvikles av én person med en stor interesse for norsk hockey og sportsanalyse. Målet er å gjøre informasjon om norsk ishockey mer tilgjengelig for både supportere, spillere, trenere og andre interesserte.</p>
+            </div>
+        </div>
+
+        <!-- HVA ER NORSK HOCKEY -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Hva er NorskHockey?</h2>
+            <div class="card">
+                <p class="prose">NorskHockey.no kombinerer tradisjonell hockeydekning med statistikk og datadrevet analyse. På siden finner du blant annet:</p>
+                <ul class="feature-list">
+                    <li>Nyheter og artikler om norsk hockey</li>
+                    <li>Statistikk for spillere, lag og ligaer</li>
+                    <li>Historiske data og resultater</li>
+                    <li>Spillerprofiler og lagprofiler</li>
+                    <li>FrostRating – vårt eget rating- og rangeringssystem</li>
+                </ul>
+                <p class="prose" style="margin-top: 1.2rem;">Målet er å gi et bredere og mer analytisk perspektiv på norsk ishockey enn det som tradisjonelt har vært tilgjengelig.</p>
+            </div>
+        </div>
+
+        <!-- OM FROSTRATING -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Om FrostRating</h2>
+            <div class="card">
+                <p class="prose" style="margin-bottom: 1rem;">FrostRating er NorskHockeys egen modell for å evaluere og sammenligne prestasjoner i norsk hockey.</p>
+                <p class="prose">Systemet er utviklet for å gi et mer helhetlig bilde av spilleres og lags prestasjoner ved å kombinere tilgjengelig statistikk og prestasjonsdata. Ratingene oppdateres løpende og brukes som et supplement til tradisjonelle statistikker.</p>
+                <div style="margin-top: 1.2rem;">
+                    <a href="om-rating.html" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ice); text-decoration: none; transition: color 0.2s;">Les mer om FrostRating →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- UAVHENGIG PROSJEKT -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Uavhengig prosjekt</h2>
+            <div class="card">
+                <p class="prose" style="margin-bottom: 1rem;">NorskHockey.no er et uavhengig prosjekt og er ikke tilknyttet Norges Ishockeyforbund, ligaer, klubber eller andre offisielle organisasjoner, med mindre dette er eksplisitt oppgitt.</p>
+                <p class="prose">Alle analyser, vurderinger og rangeringer representerer nettstedets egne vurderinger.</p>
+            </div>
+        </div>
+
+        <!-- KONTAKT -->
+        <div style="margin-bottom: 2.5rem;">
+            <h2 class="section-title">Kontakt</h2>
+            <div class="card">
+                <p class="prose" style="margin-bottom: 1.5rem;">Har du spørsmål, innspill, forslag til forbedringer eller ønsker samarbeid? Ta gjerne kontakt.</p>
+                <div class="contact-row">
+                    <div>
+                        <div class="contact-label">E-post</div>
+                        <a href="mailto:norsk.hockey@outlook.com" class="contact-link">norsk.hockey@outlook.com</a>
+                    </div>
+                    <div>
+                        <div class="contact-label">Instagram</div>
+                        <a href="https://instagram.com/norsk.hockey" target="_blank" rel="noopener" class="contact-link">@norsk.hockey</a>
+                    </div>
+                </div>
+                <p class="prose" style="margin-top: 1.5rem;">Vi setter pris på alle tilbakemeldinger som kan bidra til å gjøre NorskHockey.no bedre.</p>
+            </div>
+        </div>
+
+        <div class="rink-line"></div>
+
+        <p class="prose" style="text-align: center; color: rgba(168, 216, 240, 0.35);">Takk for at du besøker NorskHockey.no.</p>
+
+    </div>
+
+    <footer>
+        <div style="max-width: 900px; margin: 0 auto; padding: 0 1.5rem;" class="footer-inner">
+            <span>NorskHockey.no</span>
+            <span>Data: Norges Idrettsforbund · Frostwake Studio</span>
+        </div>
+    </footer>
+
+</body>
+</html>
