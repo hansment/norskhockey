@@ -1,0 +1,20 @@
+Options +FollowSymLinks
+RewriteEngine On
+
+# Fjern .html fra index
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/index\.html
+RewriteRule ^index\.html$ / [R=301,L]
+
+# Fjern .html fra andre sider
+RewriteCond %{THE_REQUEST} \s/(.+)\.html[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Rute uten .html til riktig fil
+RewriteRule ^forside/?$ /index.html [L]
+RewriteRule ^ehl/?$ /ehl.html [L]
+RewriteRule ^hockeylliga1/?$ /hl1.html [L]
+RewriteRule ^lag/?$ /lag.html [L]
+RewriteRule ^nyheter/?$ /innlegg.html [L]
+RewriteRule ^spiller/?$ /spiller.html [L]
+RewriteRule ^keeper/?$ /keeper.html [L]
+RewriteRule ^om-oss/?$ /om-norsk-hockey.html [L]
