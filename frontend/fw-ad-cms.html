@@ -386,6 +386,12 @@
                     <div class="form-gruppe">
                         <label class="form-label">Innhold</label>
                         <div id="quill-editor" style="height: 300px; background: rgba(168,216,240,0.06); border: 1px solid rgba(168,216,240,0.12); border-radius: 6px; color: var(--ice-bright);"></div>
+                        <div style="margin-top: 0.5rem;">
+                            <label for="tekst-bilde-input" class="bilde-knapp" style="font-size: 0.75rem;">
+                                📷 Sett inn bilde i tekst
+                            </label>
+                            <input type="file" id="tekst-bilde-input" accept="image/*" @change="settInnBilde($event)">
+                        </div>
                     </div>
 
                     <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem; flex-wrap: wrap;">
@@ -561,6 +567,28 @@
                     this.redigerer = null;
                     this.form = { title: '', content: '', author: 'Redaksjonen', image_url: null, published: 0 };
                     if (editor) editor.setContents([]);
+                },
+
+                async settInnBilde(event) {
+                    const fil = event.target.files[0];
+                    if (!fil) return;
+
+                    const formData = new FormData();
+                    formData.append('fil', fil);
+
+                    try {
+                        const res = await fetch(`${API}/admin/last-opp-bilde?passord=${this.passord}`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await res.json();
+                        const range = editor.getSelection(true);
+                        editor.insertEmbed(range.index, 'image', data.url);
+                        editor.setSelection(range.index + 1);
+                        event.target.value = '';
+                    } catch(e) {
+                        this.visMelding('Bildeopplasting feilet', 'feil');
+                    }
                 },
 
                 async lastOppBilde(event) {
