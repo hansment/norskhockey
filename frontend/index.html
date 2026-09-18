@@ -441,6 +441,37 @@
         .ad-placeholder .ad-lbl { font-size: 0.75rem; font-weight: 700; }
         .ad-placeholder .ad-size { font-size: 0.6rem; opacity: 0.55; }
 
+        /* SESONG BANNER */
+        .sesong-banner {
+            background: rgba(240, 192, 64, 0.07);
+            border: 1px solid rgba(240, 192, 64, 0.3);
+            border-radius: 8px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .sesong-banner-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+        .sesong-banner-tekst {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: rgba(168, 216, 240, 0.6);
+        }
+        .sesong-banner-tekst strong {
+            display: block;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+            color: rgba(240, 192, 64, 0.9);
+            margin-bottom: 0.15rem;
+        }
+
         /* MOBILE */
         .nav-links { display: flex; gap: 0.5rem; align-items: center; }
         .hamburger { display: none; flex-direction: column; gap: 5px; background: transparent; border: none; cursor: pointer; padding: 6px 4px; }
@@ -517,6 +548,15 @@
         <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem;">
             <button class="tab-btn" :class="{ active: divisjon === 'EHL' }" @click="byttDivisjon('EHL')">EHL</button>
             <button class="tab-btn" :class="{ active: divisjon === 'HL1' }" @click="byttDivisjon('HL1')">HockeyLiga1</button>
+        </div>
+
+        <!-- SESONG BANNER -->
+        <div class="sesong-banner" x-show="forrigeSesong" style="display: none;">
+            <div class="sesong-banner-icon">🏒</div>
+            <div class="sesong-banner-tekst">
+                <strong>Ny sesong er i gang!</strong>
+                Rating beregnes etter 5 kamper per spiller. Viser foreløpig topp spillere fra <span x-text="forrigeSesong"></span>.
+            </div>
         </div>
 
         <!-- TOP 5 SPILLERE -->
@@ -655,7 +695,9 @@
                 divisjon: 'EHL',
                 spillere: [],
                 keepere: [],
+                sesonger: [],
                 sesong: null,
+                forrigeSesong: null,
                 laster: true,
                 lasterKeepere: true,
                 syncStatus: 'Henter status...',
@@ -663,8 +705,8 @@
                 async init() {
                     try {
                         const res = await fetch(`${API}/sesonger`);
-                        const sesonger = await res.json();
-                        if (sesonger.length > 0) this.sesong = sesonger[0];
+                        this.sesonger = await res.json();
+                        if (this.sesonger.length > 0) this.sesong = this.sesonger[0];
                     } catch(e) {}
                     await this.hentSpillere();
                     await this.hentKeepere();
@@ -675,6 +717,7 @@
                     this.divisjon = div;
                     this.laster = true;
                     this.lasterKeepere = true;
+                    this.forrigeSesong = null;
                     await this.hentSpillere();
                     await this.hentKeepere();
                 },
@@ -685,10 +728,18 @@
                         if (this.sesong) params.append('sesong', this.sesong);
                         const res = await fetch(`${API}/spillere?${params}`);
                         const data = await res.json();
-                        this.spillere = data
-                            .filter(s => s.ovr !== null)
-                            .sort((a, b) => b.ovr - a.ovr)
-                            .slice(0, 5);
+                        let filtrert = data.filter(s => s.ovr !== null).sort((a, b) => b.ovr - a.ovr).slice(0, 5);
+
+                        if (filtrert.length === 0 && this.sesonger.length > 1) {
+                            const prev = this.sesonger[1];
+                            const params2 = new URLSearchParams({ divisjon: this.divisjon, sesong: prev });
+                            const res2 = await fetch(`${API}/spillere?${params2}`);
+                            const data2 = await res2.json();
+                            filtrert = data2.filter(s => s.ovr !== null).sort((a, b) => b.ovr - a.ovr).slice(0, 5);
+                            this.forrigeSesong = prev;
+                        }
+
+                        this.spillere = filtrert;
                     } catch(e) {
                         console.error(e);
                     } finally {
@@ -702,10 +753,18 @@
                         if (this.sesong) params.append('sesong', this.sesong);
                         const res = await fetch(`${API}/keepere?${params}`);
                         const data = await res.json();
-                        this.keepere = data
-                            .filter(k => k.ovr !== null)
-                            .sort((a, b) => b.ovr - a.ovr)
-                            .slice(0, 5);
+                        let filtrert = data.filter(k => k.ovr !== null).sort((a, b) => b.ovr - a.ovr).slice(0, 5);
+
+                        if (filtrert.length === 0 && this.sesonger.length > 1) {
+                            const prev = this.sesonger[1];
+                            const params2 = new URLSearchParams({ divisjon: this.divisjon, sesong: prev });
+                            const res2 = await fetch(`${API}/keepere?${params2}`);
+                            const data2 = await res2.json();
+                            filtrert = data2.filter(k => k.ovr !== null).sort((a, b) => b.ovr - a.ovr).slice(0, 5);
+                            this.forrigeSesong = prev;
+                        }
+
+                        this.keepere = filtrert;
                     } catch(e) {
                         console.error(e);
                     } finally {
