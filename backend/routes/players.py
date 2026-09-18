@@ -66,11 +66,17 @@ def hent_spillere(divisjon: str = None, sesong: str = None):
     return [dict(row) for row in rows]
 
 @router.get("/spillere/{person_id}")
-def hent_spiller(person_id: int):
+def hent_spiller(person_id: int, sesong: str = None):
     conn = get_connection()
     cursor = conn.cursor()
 
-    row = cursor.execute("""
+    where = "WHERE person_id = ?"
+    params = [person_id]
+    if sesong:
+        where += " AND season = ?"
+        params.append(sesong)
+
+    row = cursor.execute(f"""
         SELECT
             person_id,
             first_name,
@@ -96,9 +102,9 @@ def hent_spiller(person_id: int):
             MAX(ovr)                as ovr,
             MAX(last_updated)       as last_updated
         FROM players
-        WHERE person_id = ?
+        {where}
         GROUP BY person_id
-    """, (person_id,)).fetchone()
+    """, params).fetchone()
 
     conn.close()
 

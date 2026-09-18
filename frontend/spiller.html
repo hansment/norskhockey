@@ -344,6 +344,23 @@
         .ovr-mini.ovr-60 { background: linear-gradient(135deg, #2d2000, #4a3500); color: #d4a840; border: 1px solid #806020; }
         .ovr-mini.ovr-low { background: linear-gradient(135deg, #2d1000, #4a1a00); color: #d07040; border: 1px solid #804020; }
 
+        .season-select {
+            background: rgba(168, 216, 240, 0.06);
+            border: 1px solid rgba(168, 216, 240, 0.12);
+            border-radius: 6px;
+            color: rgba(168, 216, 240, 0.8);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            padding: 0.35rem 0.75rem;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .season-select:focus { border-color: rgba(168, 216, 240, 0.3); outline: none; }
+        .season-select option { background: #071e30; color: #d4f1ff; }
+
         /* AVANSERT STATS */
         .adv-grid {
             display: grid;
@@ -541,7 +558,14 @@
             </div>
 
             <!-- NØKKELSTATISTIKK -->
-            <h2 class="section-title" style="margin-bottom: 1rem;">Sesongstatistikk</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin-bottom: 0;">Sesongstatistikk</h2>
+                <select class="season-select" x-model="sesongValgt" @change="byttSesong()" x-show="sesonger.length > 1">
+                    <template x-for="s in sesonger" :key="s">
+                        <option :value="s" x-text="s"></option>
+                    </template>
+                </select>
+            </div>
             <div class="stats-grid" style="margin-bottom: 2.5rem;">
                 <div class="stat-box">
                     <div class="val" x-text="spiller ? spiller.games_played : '–'"></div>
@@ -720,26 +744,47 @@
             return {
                 spiller: null,
                 perLag: [],
+                sesonger: [],
+                sesongValgt: null,
+                spillerId: null,
                 laster: true,
 
                 async init() {
                     const params = new URLSearchParams(window.location.search);
                     const id = params.get('id');
                     if (!id) { window.location.href = 'ehl.html'; return; }
+                    this.spillerId = id;
 
                     await Promise.all([
-                        this.hentSpiller(id),
+                        this.hentSesonger(),
                         this.hentPerLag(id),
                     ]);
+                    await this.hentSpiller(id);
                     this.laster = false;
                     this.$nextTick(() => this.byggRadar());
                 },
 
+                async hentSesonger() {
+                    try {
+                        const res = await fetch(`${API}/sesonger`);
+                        this.sesonger = await res.json();
+                        if (this.sesonger.length > 0) this.sesongValgt = this.sesonger[0];
+                    } catch(e) { console.error(e); }
+                },
+
                 async hentSpiller(id) {
                     try {
-                        const res = await fetch(`${API}/spillere/${id}`);
+                        const params = new URLSearchParams();
+                        if (this.sesongValgt) params.set('sesong', this.sesongValgt);
+                        const res = await fetch(`${API}/spillere/${id}?${params}`);
                         this.spiller = await res.json();
                     } catch(e) { console.error(e); }
+                },
+
+                async byttSesong() {
+                    if (!this.spillerId) return;
+                    await this.hentSpiller(this.spillerId);
+                    this.$nextTick(() => this.byggRadar());
                 },
 
                 async hentPerLag(id) {
