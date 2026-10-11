@@ -391,7 +391,7 @@ def synk_alt(force=False):
 
 scheduler = BlockingScheduler()
 
-scheduler.add_job(synk_alt, 'cron', day_of_week='sun,mon,tue', hour=2, minute=0)
+scheduler.add_job(lambda: synk_alt(force=True), 'cron', day_of_week='sun,mon,tue', hour=2, minute=0)
 
 if __name__ == "__main__":
     synk_alt()
