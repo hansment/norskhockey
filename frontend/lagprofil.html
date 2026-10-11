@@ -543,6 +543,7 @@
                 lag: null,
                 spillere: [],
                 keepere: [],
+                sesong: null,
                 laster: true,
                 visning: 'spillere',
                 sortFelt: 'ovr',
@@ -552,6 +553,12 @@
                     const params = new URLSearchParams(window.location.search);
                     const id = params.get('id');
                     if (!id) { window.location.href = 'lag.html'; return; }
+
+                    try {
+                        const res = await fetch(`${API}/sesonger`);
+                        const sesonger = await res.json();
+                        if (sesonger.length > 0) this.sesong = sesonger[0];
+                    } catch(e) {}
 
                     await this.hentLag(id);
                     await this.hentSpillere(id);
@@ -568,7 +575,9 @@
 
                 async hentSpillere(id) {
                     try {
-                        const res = await fetch(`${API}/spillere`);
+                        const params = new URLSearchParams();
+                        if (this.sesong) params.set('sesong', this.sesong);
+                        const res = await fetch(`${API}/spillere?${params}`);
                         const alle = await res.json();
                         this.spillere = alle.filter(s => s.team_id == id);
                     } catch(e) { console.error(e); }
@@ -576,7 +585,9 @@
 
                 async hentKeepere(id) {
                     try {
-                        const res = await fetch(`${API}/keepere`);
+                        const params = new URLSearchParams();
+                        if (this.sesong) params.set('sesong', this.sesong);
+                        const res = await fetch(`${API}/keepere?${params}`);
                         const alle = await res.json();
                         this.keepere = alle.filter(k => k.team_id == id);
                     } catch(e) { console.error(e); }
