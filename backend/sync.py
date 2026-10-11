@@ -302,7 +302,7 @@ def beregn_rating(cursor):
             season_max_gp[s] = max(season_max_gp.get(s, 0), r["games_played"])
         for rad in rader:
             normalisert = normaliser(rad["ovr"], min_val, max_val)
-            threshold = min(season_max_gp[rad["season"]], 20)
+            threshold = 5 if season_max_gp[rad["season"]] < 20 else 20
             reliability = min(rad["games_played"] / threshold, 1.0)
             endelig = round(30 + (normalisert - 30) * reliability, 1)
             cursor.execute(
@@ -369,7 +369,7 @@ def beregn_rating(cursor):
             season_max_gp[s] = max(season_max_gp.get(s, 0), r["games_played"])
         for rad in rader:
             normalisert = normaliser(rad["ovr"], min_val, max_val)
-            threshold = min(season_max_gp[rad["season"]], 20)
+            threshold = 5 if season_max_gp[rad["season"]] < 20 else 20
             reliability = min(rad["games_played"] / threshold, 1.0)
             endelig = round(30 + (normalisert - 30) * reliability, 1)
             cursor.execute(
