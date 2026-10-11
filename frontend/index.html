@@ -757,11 +757,12 @@
 
                         if (filtrert.length === 0 && this.sesonger.length > 1) {
                             const prev = this.sesonger[1];
+                            // Faller tilbake til forrige sesong uten å påvirke banneren –
+                            // backup-keepere bør ikke styre visning av sesongbanner
                             const params2 = new URLSearchParams({ divisjon: this.divisjon, sesong: prev });
                             const res2 = await fetch(`${API}/keepere?${params2}`);
                             const data2 = await res2.json();
                             filtrert = data2.filter(k => k.ovr !== null).sort((a, b) => b.ovr - a.ovr).slice(0, 5);
-                            this.forrigeSesong = prev;
                         }
 
                         this.keepere = filtrert;
