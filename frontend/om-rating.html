@@ -449,15 +449,14 @@
 
                 <div class="factor-card">
                     <div class="factor-title">Pålitelighetsfaktor</div>
-                    <p class="prose" style="font-size: 0.82rem; margin-bottom: 1rem;">Spillere med få kamper kan ha oppblåste tall. Etter normalisering trekkes scoren mot bunnen (30) basert på antall kamper spilt.</p>
+                    <p class="prose" style="font-size: 0.82rem; margin-bottom: 1rem;">Spillere med få kamper relativt til sesonglederne kan ha oppblåste tall. Påliteligheten beregnes sesongrelativt — spilleren med flest kamper i poolen settes alltid til 100 %, og de andre skaleres mot det (maks 20 kamper for full score).</p>
                     <table class="factor-table">
-                        <tr><td>5 kamper</td><td>25 % av poengene over 30</td></tr>
-                        <tr><td>10 kamper</td><td>50 % av poengene over 30</td></tr>
-                        <tr><td>15 kamper</td><td>75 % av poengene over 30</td></tr>
-                        <tr><td>20+ kamper</td><td>Full score</td></tr>
+                        <tr><td>Tidlig sesong (maks 7 kamper spilt)</td><td>Spiller med 7K → 100 %, 5K → 71 %</td></tr>
+                        <tr><td>Mid-sesong (maks 15 kamper spilt)</td><td>Spiller med 15K → 100 %, 5K → 33 %</td></tr>
+                        <tr><td>Sen sesong (20+ kamper spilt)</td><td>20K → 100 %, 10K → 50 %, 5K → 25 %</td></tr>
                     </table>
                     <div style="margin-top: 1rem; font-size: 0.75rem; color: rgba(168,216,240,0.3); font-family: 'Barlow Condensed', sans-serif;">
-                        Formel: 30 + (normalisert − 30) × min(kamper / 20, 1.0)
+                        Formel: 30 + (normalisert − 30) × min(kamper / min(maks_kamper, 20), 1.0)
                     </div>
                 </div>
 

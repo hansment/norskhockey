@@ -296,9 +296,11 @@ def beregn_rating(cursor):
     if verdier:
         min_val = min(verdier)
         max_val = max(verdier)
+        max_gp = max(r["games_played"] for r in rader)
+        season_threshold = min(max_gp, 20)
         for rad in rader:
             normalisert = normaliser(rad["ovr"], min_val, max_val)
-            reliability = min(rad["games_played"] / 20, 1.0)
+            reliability = min(rad["games_played"] / season_threshold, 1.0)
             endelig = round(30 + (normalisert - 30) * reliability, 1)
             cursor.execute(
                 "UPDATE players SET ovr = ? WHERE person_id = ? AND team_id = ? AND season = ?",
@@ -358,9 +360,11 @@ def beregn_rating(cursor):
     if verdier:
         min_val = min(verdier)
         max_val = max(verdier)
+        max_gp = max(r["games_played"] for r in rader)
+        season_threshold = min(max_gp, 20)
         for rad in rader:
             normalisert = normaliser(rad["ovr"], min_val, max_val)
-            reliability = min(rad["games_played"] / 20, 1.0)
+            reliability = min(rad["games_played"] / season_threshold, 1.0)
             endelig = round(30 + (normalisert - 30) * reliability, 1)
             cursor.execute(
                 "UPDATE goalies SET ovr = ? WHERE person_id = ? AND team_id = ? AND season = ?",
